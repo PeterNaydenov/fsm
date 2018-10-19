@@ -1,0 +1,31 @@
+{
+  "name": "simple-fsm",
+  "version": "0.5.0",
+  "description": "Simple Finite State Machine",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test",
+    "cover": "nyc mocha test"
+  },
+  "author": "Peter Naydenov",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "nyc": "^13.1.0",
+    "expect.js": "^0.3.1"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.js"
+    ],
+    "exclude": [
+      "node_modules",
+      "test"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
+  }
+}
