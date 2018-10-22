@@ -66,13 +66,15 @@ Create an object that will contain all transition functions:
 ```
 
  ## Fsm Transition Function
+
  Fsm transition function is a function, member of transition library. Transition functions should return an object answer like
+ 
  ```js
   { 
-      success : true   // Transition success. Boolean. Required;
-    , command : null   // Next action if chaining is required. String|null|undefined. Optional;
-    , response : {}   // update answer response. Object. Optional
-    , stateData : {}  // stateData if there is stateData changes. Object.Optional; 
+      success : true   // Required. Boolean. Transition success;
+    , command : null   // Optional. String|null|undefined. Next action if chaining is required;
+    , response : {}   // Optional. Object. update answer response;
+    , stateData : {}  // Optional. Object. 'stateData' if there is stateData changes; 
    }
  ```
 
