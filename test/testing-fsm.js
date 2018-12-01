@@ -13,14 +13,14 @@ describe ( 'Finite State Machine', () => {
             // SETUP - provide machine description and transition library.
             const 
                     lib   = {
-                                switchON ( dependencies, stateData, dt ) {
-                                        return { success  : true }
-                                    }
-                            }
+                                switchON ( task, dependencies, stateData, dt ) {
+                                        setTimeout ( () => task.done ({ success : true }),   100 ) 
+                                    } // switchOn func.
+                        }
                   , machine = {
-                                 init : 'none'
-                               , table   : [
-                                           // [ fromState, action, nextState, transition ]
+                                 init  : 'none'
+                               , table : [
+                                            // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                               [ 'none',   'activate', 'active', 'switchON'  ]
                                             , [ 'active', 'stop',     'none',   'switchOFF' ]
                                         ]
@@ -28,27 +28,27 @@ describe ( 'Finite State Machine', () => {
                 ;
 
             // Create fsm. Inspect all expected values.
-
             const fsm = new Fsm ( machine, lib );
-            fsm.update ( 'activate' ) // State from 'none' to 'active'
-            fsm.update ( 'stop' )     // Will not change anything. Transition is not defined
+            fsm.update ( 'activate' )                 // State from 'none' to 'active'
+               .then ( () => fsm.update ( 'stop' ))   // Will not change anything. Transition is not defined
+               .then ( () => {
+                        expect ( fsm.state ).to.be.equal ( 'active' )
+                        expect ( fsm.initialState ).to.be.equal ( 'none' )
+                        expect ( fsm.stateData ).to.be.empty
+                        expect ( fsm.initialStateData ).to.be.empty
+                        expect ( fsm.dependencies ).to.be.empty
             
-            expect ( fsm.state ).to.be.equal ( 'active' )
-            expect ( fsm.initialState ).to.be.equal ( 'none' )
-            expect ( fsm.stateData ).to.be.empty
-            expect ( fsm.initialStateData ).to.be.empty
-            expect ( fsm.dependencies ).to.be.empty
-
-            expect ( fsm.transitions ).to.have.property ( 'none/activate' )
-            expect ( fsm.transitions ).to.have.property ( 'active/stop'   )
-            expect ( fsm.transitions['none/activate'] ).to.be.a.function
-            expect ( fsm.transitions['active/stop'] ).to.be.equal(null)
+                        expect ( fsm.transitions ).to.have.property ( 'none/activate' )
+                        expect ( fsm.transitions ).to.have.property ( 'active/stop'   )
+                        expect ( fsm.transitions['none/activate'] ).to.be.a.function
+                        expect ( fsm.transitions['active/stop'] ).to.be.equal(null)
+                        
+                        expect ( fsm.nextState).to.have.property ( 'none/activate' )
+                        expect ( fsm.nextState).to.have.property ( 'active/stop'   )
             
-            expect ( fsm.nextState).to.have.property ( 'none/activate' )
-            expect ( fsm.nextState).to.have.property ( 'active/stop'   )
-
-            expect ( fsm.nextState['none/activate'] ).to.be.equal ( 'active' )
-            expect ( fsm.nextState['active/stop'] ).to.be.equal ( 'none' )
+                        expect ( fsm.nextState['none/activate'] ).to.be.equal ( 'active' )
+                        expect ( fsm.nextState['active/stop'] ).to.be.equal ( 'none' )
+                    })
         }) // it minimal working configuration
 
 
@@ -59,15 +59,15 @@ describe ( 'Finite State Machine', () => {
         // *** Convert stateData to update-response
             const 
                   lib   = {
-                                switchON ( dependencies, stateData, dt ) {
-                                        return { success  : true, response: stateData }
+                                switchON ( task, dependencies, stateData, dt ) {
+                                        task.done ({ success  : true, response: stateData })
                                     }
                                 , switchOFF () {}
                         }
                 , machine = {
                                  init  : 'none'
                                , table : [
-                                           // [ fromState, action, nextState, transition ]
+                                            // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                               [ 'none',   'activate', 'active', 'switchON'  ]
                                             , [ 'active', 'stop',     'none',   'switchOFF' ]
                                         ]
@@ -75,10 +75,11 @@ describe ( 'Finite State Machine', () => {
                         }
                 ;
             const fsm = new Fsm ( machine, lib );
-            const result = fsm.update ( 'activate' );
-
-            expect ( result ).to.have.property ( 'say' )
-            expect ( result.say ).to.be.equal ( 'hi' )
+            fsm.update ( 'activate' )
+               .then ( result => {
+                        expect ( result ).to.have.property ( 'say' )
+                        expect ( result.say ).to.be.equal ( 'hi' )
+                    })
         }) // it Read 'stateData' from transition func.
 
 
@@ -89,18 +90,18 @@ describe ( 'Finite State Machine', () => {
             // *** Convert dependencies to update-response
                 const 
                       lib   = {
-                                    switchON ( dependencies, stateData, dt ) {
-                                            const {test} = dependencies;
-                                            return { success  : true, response: test }
+                                    switchON ( task, dependencies, stateData, dt ) {
+                                            const { test } = dependencies;
+                                            task.done ({ success  : true, response: test })
                                         }
-                                    , switchOFF () {
-                                            return { success: true }
+                                    , switchOFF ( task ) {
+                                            task.done ({ success: true })
                                         }
                             }
                     , machine = {
                                      init  : 'none'
                                    , table : [
-                                               // [ fromState, action, nextState, transition ]
+                                                // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                   [ 'none',   'activate', 'active', 'switchON'  ]
                                                 , [ 'active', 'stop',     'none',   'switchOFF' ]
                                             ]
@@ -110,11 +111,11 @@ describe ( 'Finite State Machine', () => {
                     ;
                 const fsm = new Fsm ( machine, lib );
                 fsm.setDependencies ({test})
-
-                const result = fsm.update ( 'activate' );
-    
-                expect ( result ).to.have.property ( 'say' )
-                expect ( result.say ).to.be.equal ( 'hi' )
+                fsm.update ( 'activate' )
+                   .then ( result => {
+                                expect ( result ).to.have.property ( 'say' )
+                                expect ( result.say ).to.be.equal ( 'hi' )
+                        })
             }) // it   Use 'dependencies'
 
 
@@ -125,18 +126,18 @@ describe ( 'Finite State Machine', () => {
                 // *** Reset fsm state and stateData
                     const 
                           lib   = {
-                                        switchON ( dependencies, stateData, dt ) {
+                                        switchON ( task, dependencies, stateData, dt ) {
                                                 stateData.say = 'yo-ho-ho'
-                                                return { success  : true, stateData }
+                                                task.done ({ success  : true, stateData })
                                             }
-                                        , switchOFF () {
-                                                return { success: true }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
                                             }
                                 }
                         , machine = {
                                          init  : 'none'
                                        , table : [
-                                                   // [ fromState, action, nextState, transition ]
+                                                    // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
@@ -145,14 +146,16 @@ describe ( 'Finite State Machine', () => {
                         ;
                     const fsm = new Fsm ( machine, lib );
     
-                    fsm.update ( 'activate' );
-                    expect ( fsm.stateData     ).to.have.property ( 'say' )
-                    expect ( fsm.stateData.say ).to.be.equal ( 'yo-ho-ho' )
-
-                    fsm.reset ()
-                    expect ( fsm.state         ).to.be.equal ( machine.init )
-                    expect ( fsm.stateData.say ).to.be.equal ( machine.stateData.say )
-                }) // it
+                    fsm.update ( 'activate' )
+                       .then ( result => {
+                                expect ( fsm.stateData     ).to.have.property ( 'say' )
+                                expect ( fsm.stateData.say ).to.be.equal ( 'yo-ho-ho' )
+    
+                                fsm.reset ()
+                                expect ( fsm.state         ).to.be.equal ( machine.init )
+                                expect ( fsm.stateData.say ).to.be.equal ( machine.stateData.say )
+                            })
+                }) // it reset
 
 
 
@@ -161,18 +164,18 @@ describe ( 'Finite State Machine', () => {
             it ( 'GetState', () => {
                     const 
                           lib   = {
-                                        switchON ( dependencies, stateData, dt ) {
+                                        switchON ( task, dependencies, stateData, dt ) {
                                                 stateData.say = 'yo-ho-ho'
-                                                return { success  : true, stateData }
+                                                task.done ({ success  : true, stateData })
                                             }
-                                        , switchOFF () {
-                                                return { success: true }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
                                             }
                                 }
                         , machine = {
                                          init  : 'none'
                                        , table : [
-                                                   // [ fromState, action, nextState, transition ]
+                                                    // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
@@ -180,9 +183,10 @@ describe ( 'Finite State Machine', () => {
                                 }
                         ;
                     
-                    const fsm = new Fsm ( machine, lib );
-                    const result = fsm.getState ()
-
+                    const 
+                          fsm    = new Fsm ( machine, lib )
+                        , result = fsm.getState ()
+                        ;
                     expect ( result ).to.be.equal ( 'none' )
                 }) // it getState
 
@@ -192,18 +196,18 @@ describe ( 'Finite State Machine', () => {
             it ( 'Command', () => {
                     const 
                           lib   = {
-                                        switchON ( dependencies, stateData, dt ) {
+                                        switchON ( task, dependencies, stateData, dt ) {
                                                 stateData.say = 'yo-ho-ho'
-                                                return { success : true, command : 'stop', stateData }
+                                                task.done ({ success : true, command : 'stop', stateData })
                                             }
-                                        , switchOFF () {
-                                                return { success: true }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
                                             }
                                 }
                         , machine = {
                                          init  : 'none'
                                        , table : [
-                                                   // [ fromState, action, nextState, transition ]
+                                                    // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
@@ -213,9 +217,11 @@ describe ( 'Finite State Machine', () => {
                     
                     const fsm = new Fsm ( machine, lib );
                     fsm.update ( 'activate' ) // Transition-function 'switchON' returns command 'stop'. Auto-stop.
-                    const r = fsm.getState ();
-                    expect ( r ).to.be.equal ( 'none' )
-                    expect (fsm.stateData.say).to.be.equal ( 'yo-ho-ho' )
+                       .then ( result => {
+                                    const r = fsm.getState ();
+                                    expect ( r ).to.be.equal ( 'none' )
+                                    expect (fsm.stateData.say).to.be.equal ( 'yo-ho-ho' )
+                           })
                 }) // it command
 
 
@@ -225,16 +231,16 @@ describe ( 'Finite State Machine', () => {
             it ( 'Missing init', () => {
                     const 
                           lib   = {
-                                        switchON ( dependencies, stateData, dt ) {
-                                                return { success : true }
+                                        switchON ( task, dependencies, stateData, dt ) {
+                                                task.done ({ success : true })
                                             }
-                                        , switchOFF () {
-                                                return { success: true }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
                                             }
                                 }
                         , machine = {
                                           table : [
-                                                   // [ fromState, action, nextState, transition ]
+                                                    // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
@@ -242,9 +248,10 @@ describe ( 'Finite State Machine', () => {
                         ;
                     const fsm = new Fsm ( machine, lib );
                     fsm.update ( 'activate' )
-                    const r = fsm.getState ()
-
-                    expect ( r ).to.be.equal ('N/A')
+                       .then ( () => {
+                                const r = fsm.getState ();
+                                expect ( r ).to.be.equal ( 'N/A' )
+                            })
                 }) // it Missing init
 
 
@@ -254,17 +261,17 @@ describe ( 'Finite State Machine', () => {
             it ( 'Missing lib', () => {
                     const 
                           lib   = {
-                                        switchON ( dependencies, stateData, dt ) {
-                                                return { success : true }
+                                        switchON ( task, dependencies, stateData, dt ) {
+                                                task.done ({ success : true })
                                             }
-                                        , switchOFF () {
-                                                return { success: true }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
                                             }
                                 }
                         , machine = {
                                           init :  'none'
                                         , table : [
-                                                   // [ fromState, action, nextState, transition ]
+                                                    // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
@@ -272,10 +279,93 @@ describe ( 'Finite State Machine', () => {
                         ;
                     const fsm = new Fsm ( machine );  // Argument 'lib' was forgotten.
                     fsm.update ( 'activate' )
-                    const r = fsm.getState ()
+                       .then ( () => {
+                                const r = fsm.getState ();
+                                expect ( r ).to.be.equal ( 'none' )
+                            })
+                }) // it Missing lib
+        
 
-                    expect ( r ).to.be.equal ('none')
-                }) // it Missing init
+
+
+                
+            it ( 'Chain-action on failure', () => {
+                    const 
+                          lib   = {
+                                        switchON ( task, dependencies, stateData, dt ) {
+                                                task.done ({ success : false })
+                                            }
+                                        , altOn ( task ) {
+                                                task.done ({success: true})
+                                            }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
+                                            }
+                                }
+                        , machine = {
+                                          init :  'none'
+                                        , table : [
+                                                    // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
+                                                      [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
+                                                    , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
+                                                    , [ 'active' , 'stop'         , 'none'              , 'switchOFF' ,                            ]
+                                                ]
+                                }
+                        ;
+                    const fsm = new Fsm ( machine, lib );
+                    fsm.update ( 'activate' )
+                       .then ( 
+                            () => {
+                                    const r = fsm.getState ();
+                                    expect ( r ).to.be.equal ( 'alternativeSource' )
+                                })
+                }) // it Chain-action on failure
+
+
+
+
+
+            it ( 'Subscribe for "update", "transition", "positive", "negative"', () => {
+                    const 
+                          lib   = {
+                                        switchON ( task, dependencies, stateData, dt ) {
+                                                task.done ({ success : false })
+                                            }
+                                        , altOn ( task ) {
+                                                task.done ({success: true})
+                                            }
+                                        , switchOFF ( task ) {
+                                                task.done ({ success: true })
+                                            }
+                                }
+                        , machine = {
+                                          init :  'none'
+                                        , table : [
+                                                    // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
+                                                      [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
+                                                    , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
+                                                    , [ 'active' , 'stop'         , 'none'              , 'switchOFF' ,                            ]
+                                                ]
+                                }
+                        ;
+                    const fsm = new Fsm ( machine, lib );
+                    let count = 0;
+                    fsm.on ( 'negative', state => {
+                                expect ( state ).to.be.equal ( 'none' )
+                         })
+                    fsm.on ( 'transition', ( state, response) => {
+                                if ( count == 0 )   expect ( state ).to.be.equal ( 'none'              )
+                                else                expect ( state ).to.be.equal ( 'alternativeSource' )
+                                count++
+                          })
+                    fsm.on ( 'positive', ( state, response) => {
+                                expect ( state ).to.be.equal ( 'alternativeSource' )
+                          })
+                    fsm.on ( 'update', ( state, response ) => {
+                                expect ( state ).to.be.equal ( 'alternativeSource' )
+                          })
+                    fsm.update ( 'activate' )
+                }) // it Alt action on failure
 }) // describe
 
 

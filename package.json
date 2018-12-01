@@ -9,11 +9,14 @@
   },
   "author": "Peter Naydenov",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "ask-for-promise": "^1.3.1"
+  },
   "devDependencies": {
     "chai": "^4.2.0",
-    "nyc": "^13.1.0",
-    "expect.js": "^0.3.1"
+    "expect.js": "^0.3.1",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
   },
   "nyc": {
     "include": [
