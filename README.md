@@ -155,7 +155,7 @@ Only one of the params in this object is required:
 ```
 
 
-### fsm.setDependencies
+### fsm.setDependencies ()
 Set dependencies for FSM. Dependency object will be provided to every transition function. With **dependency injection** code will stay testable. Don't forget to add here all **window** based objects and functions that are available only in the browser environment.
 
 ```js
@@ -174,7 +174,7 @@ Set dependencies for FSM. Dependency object will be provided to every transition
 
 
 
-### fsm.getState
+### fsm.getState ()
 Will return current current FSM state. 
 
 ```js
@@ -184,7 +184,7 @@ Will return current current FSM state.
 
 
 
-### fsm.update
+### fsm.update ()
 Provide actions to FSM. If conditions 'state/action' exist in description table, FSM will react.
 ```js
  fsm.update ( action, altData)
@@ -198,7 +198,7 @@ Provide actions to FSM. If conditions 'state/action' exist in description table,
 
 
 
-### fsm.reset
+### fsm.reset ()
 Returns initial values for state and stateData.
 
 ```js
