@@ -1,4 +1,4 @@
-#@peter.naydenov/fsm
+# FSM (@peter.naydenov/fsm)
 
 Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.
 ```js
@@ -33,8 +33,8 @@ const transitionLibrary = {
 
 It's simple and clean way to represent system behaviour but practice shows that is not enough. This implementation was extended to cover some aditional program needs like:
 - Transition function could contain asynchronous code; 
-- Transition chaining inside the description table (Optional);
-- Chain on positive and negative exit from the transition;
+- Chain-actions in **transaction conditions** (Optional);
+- Chain-actions are possible on **positive** and *negative* transition-end;
 
 These features are available after version 2 of the library.
 
@@ -105,6 +105,10 @@ Object that will contain all transition functions:
  }
 ```
 
+
+
+
+
  ## Fsm Transition Function
 
  Fsm transition function is a function, member of transition library. Transition functions is kind of middleware. Every function receives 4 arguments:
@@ -121,7 +125,14 @@ const lib = {
  - stateObject  - object. Contains all helper params needed to support the FSM state;
  - dt           - object. External data provided from fsm.update( action, **dt**);
 
-Execution of transition function will end on `task.done(end)` where **end** is an **transitionResult** object. Only one of the params in this object is required:
+Execution of transition function will end on `task.done(end)` where **end** is an **transitionResult** object. 
+
+
+
+
+
+## transitionResult
+Only one of the params in this object is required:
  
  ```js
   { 
@@ -134,19 +145,128 @@ Execution of transition function will end on `task.done(end)` where **end** is a
 
 
 
+## FSM Methods
+
+```js
+{
+   setDependencies : 'Insert all external dependencies'
+ , getState        : 'Returns actual state'
+ , update          : 'Trigger an action'
+ , reset           : 'Revert state and stateData to initial values described during initialization'
+}
+```
+
+
+### fsm.setDependencies
+Set dependencies for FSM. Dependency object will be provided to every transition function. With **dependency injection** code will stay testable. Don't forget to add here all **window** based objects and functions that are available only in the browser environment.
+
+```js
+ const 
+      moment = require ( 'moment' )
+    , fsm = new Fsm ()
+    , deps = {
+              scrollTo : window.scrollTo
+            , moment 
+        }
+    ;
+
+  fsm.setDependencies ( deps )     
+```
+- Method returns: void;
+
+
+
+### fsm.getState
+Will return current current FSM state. 
+
+```js
+ let currentState = fsm.getState ()
+```
+- Method returns: string. Current FSM state;
+
+
+
+### fsm.update
+Provide actions to FSM. If conditions 'state/action' exist in description table, FSM will react.
+```js
+ fsm.update ( action, altData)
+    .then ( r => {
+             // ...do something with the response
+        })
+```
+- **action**(required): string. The action.
+- **altData**(optional): any. Additional data provided to the transition;
+- Method returns: Promise<any>. Returned value is equal to transitionResult.response;
+
+
+
+### fsm.reset
+Returns initial values for state and stateData.
+
+```js
+  fsm.reset ()
+```
+- Method returns: void;
+
+
+
+
+
+## Example
+
+Example represents controller for system that require electricity. On `fsm.update('start')` controller will try to activate standard electricity source. On fail will trigger chain-action `generator` and will try to activate alternative energy source. On success state will become `alternativeSource`. When standart electricity source is available we can inform the system by calling `fsm.update('electricity')` and on success state will become `active`. Switch off the system any time by calling `fsm.update('stop')`.
+
+```js
+const 
+        lib   = {  
+                    switchON ( task, dependencies, stateData, dt ) {
+                            task.done ({ success : false })
+                        }
+                    , altOn ( task ) {
+                            task.done ({ success: true })
+                        }
+                    , switchOFF ( task ) {
+                            task.done ({ success: true })
+                        }
+                    , primarySource ( task ) {
+                            task.done ({ success: true })
+                        }
+            }
+    , machine = {
+                      init  :  'none'
+                    , table : [
+                                [ 'none'   , 'start', 'active' , 'switchON', [ false, 'generator']  ]
+                              , [ 'none'   , 'generator'  , 'alternativeSource'   , 'altOn'         ]
+                              , [ 'active'            , 'stop' , 'none'           , 'switchOFF'     ]
+                              , [ 'alternativeSource' , 'stop' , 'none'           , 'switchOFF'     ]
+                              , [ 'alternativeSource' , 'electricity' , 'active'  , 'primarySource' ]
+                            ]
+                }
+    ;
+const fsm = new Fsm ( machine, lib );
+fsm.update ( 'activate' )
+    .then ( () => {
+                const r = fsm.getState ();
+                expect ( r ).to.be.equal ( 'alternativeSource' )
+            })
+
+```
+
+
+
 
 
 ## Migration from v.1 to v.2
 Project was started with simplest posible implementation. I like the approach and want to extend it. Reasons:
 - Some of my transition function contain asynchronous events; 
-- Create chains of transitions inside the description table;
-- Chain on positive and negative exit from the transition;
+- Describe chain of actions inside the transition condition records;
+- Chain of action on positive and negative transition end;
 
 So... about changes:
 ### Transition complete
-- Version 1: Transition function should return **transitionResult** object.
-- Version 2: Transition function receives as first param **task**. Task is askForPromise object. Transition is complete on `task.done(transitionResult)`.
-- Changes: Find return statement and convert it to task.done:
+- **Version 1**: Transition function should return **transitionResult** object.
+- **Version 2**: Transition function receives as first param **task**. Task is askForPromise object. Transition is complete on `task.done(transitionResult)`.
+- **Changes**: Find return statement and convert it to task.done:
 
 ```js
     // before ->
@@ -171,18 +291,18 @@ So... about changes:
 
 ```
 
-- Change: Open transition library and add 'task' argument to all transitioin functions.
+- **Change**: Open transition library and add 'task' argument to all transitioin functions.
 
 
 
 ### Description table
-- Version 1: Transition condition in description table:
+- **Version 1**: Transition condition in description table:
     ```js
         [ 'state', 'action', 'nextState', 'transitionFx' ]
     ```
     All fields are string and are required.
 
-- Version 2: Fields in description table record:
+- **Version 2**: Fields in description table record:
     ```js
         [ 'state', 'action', 'nextState', 'transitionFx', 'chainActions' ]
         // chainAction is array [ nextAction, nextAction ]
@@ -196,7 +316,7 @@ So... about changes:
   ChainActions is an array with two values. First value represents next action on success transition. 
   Second on failed transition. ChainAction is optional.
 
-- Changes: As ChainActions is an optional parameter, no changes needed.
+- **Changes**: As ChainActions is an optional parameter, no changes needed.
 
 
 
@@ -206,5 +326,37 @@ So... about changes:
 - Version 2:
     TransitionResult with property 'command' still works. Chaining in description-table is more powerfull and will overwrite transitionResult's "command" property.
 - Changes: No changes needed but is much better to describe chains in description table instead in transition functions. Keep all logic flows on one place for easy reading and manipulating.
+
+
+
+
+
+## Release History
+
+### 2.0.0 (2018-12-01)
+- [x] Transition function could contain asynchronous code;
+- [x] Chain-actions in **transaction conditions** (Optional);
+- [x] Chain-actions are possible on **positive** and *negative* transition-end;
+
+### 1.0.0 (2018-11-21)
+- [x] FSM;
+- [x] Set FSM external dependencies;
+- [x] Chain-actions by using `command` in transition response object;
+- [x] Internal state flags and values with stateData;
+
+
+
+
+
+## Credits
+'@peter.naydenov/fsm' was created by Peter Naydenov.
+
+
+
+
+
+
+## License
+'@peter.naydenov/fsm' is released under the MIT License.
 
 
