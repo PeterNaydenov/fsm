@@ -148,12 +148,10 @@ Only one of the params in this object is required:
 ## FSM Methods
 
 ```js
-{
    setDependencies : 'Insert all external dependencies'
  , getState        : 'Returns actual state'
  , update          : 'Trigger an action'
  , reset           : 'Revert state and stateData to initial values described during initialization'
-}
 ```
 
 
@@ -172,7 +170,7 @@ Set dependencies for FSM. Dependency object will be provided to every transition
 
   fsm.setDependencies ( deps )     
 ```
-- Method returns: void;
+- **Method returns**: void;
 
 
 
@@ -182,7 +180,7 @@ Will return current current FSM state.
 ```js
  let currentState = fsm.getState ()
 ```
-- Method returns: string. Current FSM state;
+- **Method returns**: string. Current FSM state;
 
 
 
@@ -196,7 +194,7 @@ Provide actions to FSM. If conditions 'state/action' exist in description table,
 ```
 - **action**(required): string. The action.
 - **altData**(optional): any. Additional data provided to the transition;
-- Method returns: Promise<any>. Returned value is equal to transitionResult.response;
+- **Method returns**: Promise of any. Returned value is equal to transitionResult.response;
 
 
 
@@ -206,7 +204,7 @@ Returns initial values for state and stateData.
 ```js
   fsm.reset ()
 ```
-- Method returns: void;
+- **Method returns**: void;
 
 
 
@@ -235,11 +233,11 @@ const
     , machine = {
                       init  :  'none'
                     , table : [
-                                [ 'none'   , 'start', 'active' , 'switchON', [ false, 'generator']  ]
-                              , [ 'none'   , 'generator'  , 'alternativeSource'   , 'altOn'         ]
-                              , [ 'active'            , 'stop' , 'none'           , 'switchOFF'     ]
-                              , [ 'alternativeSource' , 'stop' , 'none'           , 'switchOFF'     ]
-                              , [ 'alternativeSource' , 'electricity' , 'active'  , 'primarySource' ]
+                                [ 'none'   , 'start'      , 'active' , 'switchON', [ false, 'generator']  ]
+                              , [ 'none'   , 'generator'  , 'altSrc' , 'altOn'         ]
+                              , [ 'active' , 'stop'       , 'none'   , 'switchOFF'     ]
+                              , [ 'altSrc' , 'stop'       , 'none'   , 'switchOFF'     ]
+                              , [ 'altSrc' , 'electricity' , 'active', 'primarySource' ]
                             ]
                 }
     ;
@@ -247,7 +245,7 @@ const fsm = new Fsm ( machine, lib );
 fsm.update ( 'activate' )
     .then ( () => {
                 const r = fsm.getState ();
-                expect ( r ).to.be.equal ( 'alternativeSource' )
+                expect ( r ).to.be.equal ( 'altSrc' )
             })
 
 ```
