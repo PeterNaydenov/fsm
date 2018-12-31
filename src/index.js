@@ -12,6 +12,8 @@ class Fsm {
                 ;
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
+            fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
+            fsm.cache            = []      // cached 'update' commands
 
             fsm.stateData        = sData
             fsm.initialStateData = sData
@@ -144,6 +146,10 @@ class Fsm {
                       fsm = this
                     , theUpdate = askForPromise ()
                     ;
+                if ( fsm.lock ) {  
+                        fsm.cache.push ( { theUpdate, action, dt })
+                        return theUpdate.promise
+                   }
                 fsm._updateStep ( theUpdate, action, dt )
                 return theUpdate.promise
         } // update func.
@@ -159,6 +165,7 @@ class Fsm {
                     , key  = `${fsm.state}/${action}`
                     , oldState = fsm.state
                     ;
+                fsm.lock = true
                 fsm.transit ( task, key, dt )
                 task.onComplete (
                         result => {
@@ -200,11 +207,29 @@ class Fsm {
                                            fsm._updateStep ( theUpdate, result.command, data )
                                            return
                                       }
-                                cb [ 'update' ].forEach ( fn => fn ( fsm.state, data)   )
+                                cb [ 'update' ].forEach ( fn => fn ( fsm.state, data)   )                                
                                 theUpdate.done ( data )
+                                fsm.lock = false
+                                fsm._triggerCacheUpdate ()
                         }) // onComplete
                 task.promise.catch ( () =>  console.log ( `Failed in step ${key}`)   )
         }  // updateStep func.
+
+
+
+
+
+      _triggerCacheUpdate () {
+                const fsm = this;
+                if ( fsm.cache.length !== 0 ) {
+                                        const { theUpdate, action, dt } = fsm.cache [0]
+                                        fsm.cache = fsm.cache.reduce ( (res,el,i) => {
+                                                                if ( i != 0 )   res.push(el)
+                                                                return res
+                                                        },[] )
+                                        fsm._updateStep ( theUpdate, action, dt )
+                        }
+        }  // _triggerCachceUpdate func.
 
 
 

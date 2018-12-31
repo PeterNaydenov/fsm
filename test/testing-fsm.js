@@ -366,6 +366,67 @@ describe ( 'Finite State Machine', () => {
                           })
                     fsm.update ( 'activate' )
                 }) // it Alt action on failure
+    
+    
+    
+    
+    
+            it ( 'Prevent simultaneous updates', () => {
+                    const 
+                        description = {
+                                          init  : 'center'
+                                        , table : [ 
+                                                          [ 'center', 'goLeft', 'left', 'gotoLeft'    ]
+                                                        , [ 'center', 'goRight', 'right', 'gotoRight' ]
+                                                        , [ 'left'  , 'goRight', 'center', 'failure'  ]
+                                                  ]
+                                    }
+                        , transitions = {
+                                  gotoLeft ( task ) {
+                                            setTimeout ( () => {
+                                                    task.done ({ 
+                                                                  success : true
+                                                                , response  : 'Aloha'
+                                                            }) 
+                                                }, 300)
+                                            }
+                                , gotoRight ( task, dependencies, stateData, dt ) {
+                                            task.done ({
+                                                          success : true
+                                                        , response  : 'Guten tag'
+                                                })
+                                        }
+                                , failure ( task, dependencies, stateData, dt ) {
+                                            task.done ({
+                                                              success : true
+                                                            , response : dt
+                                                    })
+                                        }
+                            }
+                    const fsm = new Fsm ( description, transitions );
+
+                    let resultState = 'none';
+                    
+                    fsm.update ( 'goLeft' ).then ( r => {
+                            expect ( resultState ).to.be.equal ( 'none' )
+                            expect ( r ).to.be.equal ( 'Aloha' )
+                            resultState = 'left'
+                        })
+                    fsm.update ( 'goRight', 'right from left' ).then ( r => {
+                                const state = fsm.getState ();
+                                expect ( resultState ).to.be.equal ( 'left' )
+                                expect ( state ).to.be.equal ( 'center' )
+                                expect ( r ).to.be.equal ( 'right from left' )
+                                expect ( fsm.cache ).to.have.length ( 0 )
+                                resultState = 'center'
+                        })
+                    fsm.update ( 'goRight' ).then ( r => {
+                                const state = fsm.getState ();
+                                expect ( resultState ).to.be.equal ( 'center' )
+                                expect ( state ).to.be.equal ( 'right' )
+                                expect ( r ).to.be.equal ( 'Guten tag' )
+                        })
+                }) // it prevent simultaneous updates
 }) // describe
 
 
