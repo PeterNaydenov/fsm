@@ -427,6 +427,71 @@ describe ( 'Finite State Machine', () => {
                                 expect ( r ).to.be.equal ( 'Guten tag' )
                         })
                 }) // it prevent simultaneous updates
+
+
+
+
+
+            it ( 'Export State', () => {
+                    const
+                          description = {
+                                               init : 'none'
+                                             , table : [
+                                                            [ 'none', 'start', 'initial', 'startUp' ]
+                                                          , [ 'initial', 'move', 'active', 'fireUp'  ]
+                                                       ]
+                                }
+                        , transitions = {
+                                            startUp ( task, dependencies, stateData, dt ) {
+                                                        const response = {
+                                                                          success : true
+                                                                        , stateData : { 'duringStart' : 'one' }
+                                                                    }
+                                                        task.done ( response )
+                                                } // startup func.
+                                            , fireUp ( task, dependencies, stateData, dt ) {
+                                                        const
+                                                              updateStateData = Object.assign ( {}, stateData, { 'duringFireUp' : 'second'})
+                                                            , response = {
+                                                                              success : true
+                                                                            , stateData : updateStateData
+                                                                        }
+                                                            ;
+                                                        task.done ( response )
+                                                } // fireup func.
+                               }
+                        ;
+                    const fsm = new Fsm ( description, transitions );
+
+                    fsm.update ( 'start' )
+                       .then ( x => fsm.update ( 'move' ))
+                       .then ( x => {
+                                    const result = fsm.exportState ();
+                                    expect ( result ).to.have.property ( 'state' )
+                                    expect ( result.state ).to.be.equal ( 'active' )
+                                    expect ( result).to.have.property ( 'stateData' )
+                                    expect ( result.stateData ).to.have.property ( 'duringStart'  )
+                                    expect ( result.stateData ).to.have.property ( 'duringFireUp' )
+                            })
+               }) // it Export State
+            
+            it ( 'Import externalState', () => {
+                    const
+                            description = {
+                                            init  : 'none'
+                                            , table : [
+                                                              [ 'none', 'start', 'initial', 'startUp' ]
+                                                            , [ 'initial', 'move', 'active', 'fireUp'  ]
+                                                        ]
+                                }
+                    const fsm = new Fsm ( description );
+                    fsm.importState ( {
+                                  state     : 'imported'
+                                , stateData : { in : true }
+                            })
+                    expect ( fsm.state ).to.be.equal ( 'imported' )
+                    expect ( fsm.stateData ).to.have.property ( 'in' )
+               }) // it Import externalState
 }) // describe
 
 

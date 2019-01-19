@@ -151,6 +151,8 @@ Only one of the params in this object is required:
    setDependencies : 'Insert all external dependencies'
  , getState        : 'Returns actual state'
  , update          : 'Trigger an action'
+ , exportState     : 'Export state and stateData as a single object (externalState)'
+ , importState     : 'Import externalState object.'
  , reset           : 'Revert state and stateData to initial values described during initialization'
 ```
 
@@ -195,6 +197,46 @@ Provide actions to FSM. If conditions 'state/action' exist in description table,
 - **action**(required): string. The action.
 - **altData**(optional): any. Additional data provided to the transition;
 - **Method returns**: Promise of any. Returned value is equal to transitionResult.response;
+
+
+
+
+
+### fsm.exportState ()
+Export state and stateData as a single object (**externalState**). Export state to:
+- Keep fsm history record;
+- Possible point of recovery;
+- Synchronize fsm states accross the network in large distributed systems;
+- Debuging purposes;
+
+```js
+   const externalState = fsm.exportState ();
+   /**
+    *  externalState = {
+    *                     state : 'actualState'
+    *                   , stateData : {
+    *                                   ... all stateData flags are here
+    *                                }
+    *               }
+    * */
+```
+
+- **Method returns**: externalState object
+
+
+
+
+
+### fsm.importState ()
+Put fsm in specific state by importing **externalState** object described in 'exportState()' method. Use method to:
+- Recover previous state of the fsm;
+- Testing specific situations by moving fsm directly in required state;
+- Synchronize fsm states accross the network;
+
+- **externalState**: externalState object
+- **Method returns**: void
+
+
 
 
 
@@ -330,6 +372,14 @@ So... about changes:
 
 
 ## Release History
+
+### 2.1.0 (2019-01-19)
+- [x] Export fsm state as object (externalState)
+- [x] Import externalState
+- [x] Lock updates during update process execution;
+- [x] Prevent simultaneous updates;
+- [x] Cache new updates during update process execution;
+- [x] Execute cached updates in a row;
 
 ### 2.0.0 (2018-12-01)
 - [x] Transition function could contain asynchronous code;

@@ -158,6 +158,35 @@ class Fsm {
 
 
 
+      importState ( {state, stateData} ) {
+      // *** Import existing state to fsm
+                const fsm = this;
+                if ( state ) {
+                        fsm.state = state
+                        fsm.stateData = Object.assign ( {}, stateData )
+                   }
+        } // importState func.
+
+
+
+
+
+      exportState () {
+      // *** Export internal flags and state as an object
+                const 
+                          fsm       = this
+                        , state     = fsm.state
+                        , stateData = Object.assign  ( {}, fsm.stateData )
+                        ;
+                return {
+                          state
+                        , stateData
+                     }
+        } // exportState func.
+
+
+
+
      _updateStep ( theUpdate, action, dt ) {
                 const 
                       fsm = this
