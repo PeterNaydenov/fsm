@@ -407,20 +407,23 @@ describe ( 'Finite State Machine', () => {
 
                     let resultState = 'none';
                     
-                    fsm.update ( 'goLeft' ).then ( r => {
+                    fsm.update ( 'goLeft' )
+                       .then ( r => {
                             expect ( resultState ).to.be.equal ( 'none' )
                             expect ( r ).to.be.equal ( 'Aloha' )
                             resultState = 'left'
                         })
-                    fsm.update ( 'goRight', 'right from left' ).then ( r => {
+                    fsm.update ( 'goRight', 'right from left' )
+                       .then ( r => {
                                 const state = fsm.getState ();
                                 expect ( resultState ).to.be.equal ( 'left' )
                                 expect ( state ).to.be.equal ( 'center' )
                                 expect ( r ).to.be.equal ( 'right from left' )
-                                expect ( fsm.cache ).to.have.length ( 0 )
+                                expect ( fsm.cache ).to.have.length ( 1 )
                                 resultState = 'center'
                         })
-                    fsm.update ( 'goRight' ).then ( r => {
+                    fsm.update ( 'goRight' )
+                       .then ( r => {
                                 const state = fsm.getState ();
                                 expect ( resultState ).to.be.equal ( 'center' )
                                 expect ( state ).to.be.equal ( 'right' )
@@ -475,10 +478,14 @@ describe ( 'Finite State Machine', () => {
                             })
                }) // it Export State
             
+
+
+
+
             it ( 'Import externalState', () => {
                     const
                             description = {
-                                            init  : 'none'
+                                              init  : 'none'
                                             , table : [
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
@@ -492,6 +499,55 @@ describe ( 'Finite State Machine', () => {
                     expect ( fsm.state ).to.be.equal ( 'imported' )
                     expect ( fsm.stateData ).to.have.property ( 'in' )
                }) // it Import externalState
+
+
+
+
+
+            it ( 'Ignore Cached Updates', () => {
+                    const
+                              description = {
+                                              init  : 'none'
+                                            , table : [
+                                                              [ 'none', 'start', 'initial', 'startUp' ]
+                                                            , [ 'initial', 'move', 'active', 'fireUp'  ]
+                                                        ]
+                                }
+                            , transitions = {
+                                       startUp ( task ) {
+                                            setTimeout ( () => {
+                                                    task.done ({ 
+                                                                  success   : true 
+                                                                , stateData : { yo:'hello' }
+                                                            })
+                                                }, 200 )
+                                          } // startUp func.
+                                    , fireUp ( task ) {
+                                                task.done ({ 
+                                                              success : true
+                                                            , stateData :  { 'wrong' : true }
+                                                        })
+                                          } // fireUp func.
+                                }
+                            ;
+                    let result;
+                    const fsm = new Fsm ( description, transitions );
+                    fsm.update ( 'start' ).then ( x =>  fsm.ignoreCachedUpdates () )
+                    fsm.update ( 'move' )
+                       .then ( x => {   
+                                    result = fsm.exportState ()
+                                    expect ( result.state ).to.be.equal ( 'initial' )
+                                }
+                              , x => {   //---> ignoreCachedUpdates should move logic here. X will contain error message produced by fsm.
+                                    result = fsm.exportState ()
+                                    expect ( result.state ).to.be.equal ( 'initial' )
+                                    expect ( result.stateData ).to.have.property ( 'yo' )
+                                    expect ( result.stateData.yo ).to.be.equal ( 'hello' )
+                                    expect ( result.stateData ).to.not.have.property ( 'wrong' )
+                                    expect ( x ).to.be.equal ( "Action 'move' was ignored" )
+                                })
+               }) // it Ignore cached updates
+
 }) // describe
 
 

@@ -118,48 +118,14 @@ class Fsm {
 
 
 
-     transit ( task, key, dt ) {   // ( promiseObj, transitionKey, additionalData ) -> void
-     // *** Execute transition if exists. Ignore all non-predefined cases
-                const
-                      fsm = this
-                    , dependencies = Object.assign ( {}, fsm.dependencies )
-                    , stateData    = Object.assign ( {}, fsm.stateData )
-                    , transition   = fsm.transitions [ key ]
-                    ;
-                if ( typeof transition === 'function' )   transition ( task, dependencies, stateData, dt )
-                else                                      task.done ({ success : false })   // ignore all non-predefined cases
-        } // transit func.
-
-
-
-
-
       getState () { return this.state }
-        
-
-
-
-
-      update ( action, dt ) {   // () -> Promise<transitionResponse>
-      // *** Executes transition-functions and transition-chains.
-                const 
-                      fsm = this
-                    , theUpdate = askForPromise ()
-                    ;
-                if ( fsm.lock ) {  
-                        fsm.cache.push ( { theUpdate, action, dt })
-                        return theUpdate.promise
-                   }
-                fsm._updateStep ( theUpdate, action, dt )
-                return theUpdate.promise
-        } // update func.
 
 
 
 
 
       importState ( {state, stateData} ) {
-      // *** Import existing state to fsm
+        // *** Import existing state to fsm
                 const fsm = this;
                 if ( state ) {
                         fsm.state = state
@@ -172,7 +138,7 @@ class Fsm {
 
 
       exportState () {
-      // *** Export internal flags and state as an object
+        // *** Export internal flags and state as an object
                 const 
                           fsm       = this
                         , state     = fsm.state
@@ -187,12 +153,46 @@ class Fsm {
 
 
 
+
+      transit ( task, key, dt ) {   //   ( promiseObj, transitionKey, additionalData ) -> void
+        // *** Execute transition if exists. Ignore all non-predefined cases
+                const
+                        fsm = this
+                     , dependencies = Object.assign ( {}, fsm.dependencies )
+                     , stateData    = Object.assign ( {}, fsm.stateData )
+                     , transition   = fsm.transitions [ key ]
+                     ;
+                if ( typeof transition === 'function' )   transition ( task, dependencies, stateData, dt )
+                else                                      task.done ({ success : false })   // ignore all non-predefined cases
+        } // transit func.
+           
+           
+           
+
+
+      update ( action, dt ) {   //   () -> Promise<transitionResponse>
+        // *** Executes transition-functions and transition-chains.
+                const 
+                        fsm = this
+                      , theUpdate = askForPromise ()
+                      ;
+                if ( fsm.lock ) {  
+                        fsm.cache.push ( { theUpdate, action, dt })
+                        return theUpdate.promise
+                   }
+                fsm._updateStep ( theUpdate, action, dt )
+                return theUpdate.promise
+        } // update func.
+
+
+
+
+
      _updateStep ( theUpdate, action, dt ) {
                 const 
                       fsm = this
                     , task = askForPromise ()
                     , key  = `${fsm.state}/${action}`
-                    , oldState = fsm.state
                     ;
                 fsm.lock = true
                 fsm.transit ( task, key, dt )
@@ -236,14 +236,34 @@ class Fsm {
                                            fsm._updateStep ( theUpdate, result.command, data )
                                            return
                                       }
-                                cb [ 'update' ].forEach ( fn => fn ( fsm.state, data)   )                                
                                 theUpdate.done ( data )
-                                fsm.lock = false
-                                fsm._triggerCacheUpdate ()
+
+                                const updateCallbacks = askForPromise ( cb['update'] )
+                                cb [ 'update' ].forEach ( (fn,i) => {
+                                                fn ( fsm.state, data )
+                                                updateCallbacks[i].done ()
+                                        })
+                                updateCallbacks.onComplete ( x => {
+                                                fsm.lock = false
+                                                fsm._triggerCacheUpdate ()
+                                        })
                         }) // onComplete
                 task.promise.catch ( () =>  console.log ( `Failed in step ${key}`)   )
         }  // updateStep func.
 
+
+
+
+
+       ignoreCachedUpdates () {
+        // *** Ignore all cached updates
+                const 
+                          fsm   = this
+                        , cache = fsm.cache
+                        ;
+                cache.forEach ( ({theUpdate, action, dt} ) =>  theUpdate.cancel ( `Action '${action}' was ignored` ))
+                fsm.cache = []
+          }  // ignoreCache func.
 
 
 

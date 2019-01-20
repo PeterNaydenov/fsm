@@ -32,11 +32,14 @@ const transitionLibrary = {
 ```
 
 It's simple and clean way to represent system behaviour but practice shows that is not enough. This implementation was extended to cover some aditional program needs like:
-- Transition function could contain asynchronous code; 
-- Chain-actions in **transaction conditions** (Optional);
-- Chain-actions are possible on **positive** and *negative* transition-end;
+- Transition function could contain asynchronous code(Available after version 2.0); 
+- Chain-actions in **transaction conditions** (Optional after version 2.0);
+- Chain-actions are possible on **positive** and *negative* transition-end (After version 2.0);
+- Export fsm state as an object: externalState. (Available after version 2.1);
+- Import externalState (Available after version 2.1);
+- Prevent simultaneous updates (Available after version 2.1);
+- Cache stack for fsm-updates and postponed execution (Available after version 2.1);
 
-These features are available after version 2 of the library.
 
 
 
@@ -148,12 +151,13 @@ Only one of the params in this object is required:
 ## FSM Methods
 
 ```js
-   setDependencies : 'Insert all external dependencies'
- , getState        : 'Returns actual state'
- , update          : 'Trigger an action'
- , exportState     : 'Export state and stateData as a single object (externalState)'
- , importState     : 'Import externalState object.'
- , reset           : 'Revert state and stateData to initial values described during initialization'
+   setDependencies     : 'Insert all external dependencies'
+ , getState            : 'Returns actual state'
+ , update              : 'Trigger an action'
+ , exportState         : 'Export state and stateData as a single object (externalState)'
+ , importState         : 'Import externalState object.'
+ , reset               : 'Revert state and stateData to initial values described during initialization'
+ , ignoreCachedUpdates : 'Ignore all cached updates'
 ```
 
 
@@ -252,9 +256,39 @@ Returns initial values for state and stateData.
 
 
 
+### fsm.ignoreCachedUpdates ()
+Ignore all cached updates.
+
+```js
+const fsm = new Fsm ( description, transitions );
+fsm.update ( 'start' ).then ( x =>  fsm.ignoreCachedUpdates () ) 
+/** 
+ *  Update with action 'start' will block all upcoming updates. Subsequent updates
+ *  will wait by using cache mechanism.
+ *  Method 'ignoreCachedUpdates' will remove updates from cache and will close their promises with 'reject' and
+ *  error message.
+ *  Use reject function to customize 'canceled updates' behaviour
+ */
+fsm.update ( 'move' )
+    .then ( r => {   // resolve function
+                result = fsm.exportState ()
+                expect ( result.state ).to.be.equal ( 'initial' )
+              }
+            , r => {   // reject function
+                //---> 'r' will contain error message produced by fsm.
+                //  r == "Action 'move' was ignored"
+            })
+```
+
+- **Method returns**: void;
+
+
+
+
+
 ## Example
 
-Example represents controller for system that require electricity. On `fsm.update('start')` controller will try to activate standard electricity source. On fail will trigger chain-action `generator` and will try to activate alternative energy source. On success state will become `alternativeSource`. When standart electricity source is available we can inform the system by calling `fsm.update('electricity')` and on success state will become `active`. Switch off the system any time by calling `fsm.update('stop')`.
+Example represents controller for system that require electricity. On `fsm.update('start')` controller will try to activate standard electricity source. On fail will trigger chain-action `generator` and will try to activate alternative energy source. On success state will become `altSrc`(alternativeSource). When standart electricity source is available we can inform the system by calling `fsm.update('electricity')` and on success state will become `active`. Switch off the system any time by calling `fsm.update('stop')`.
 
 ```js
 const 
@@ -309,10 +343,10 @@ So... about changes:
 - **Changes**: Find return statement and convert it to task.done:
 
 ```js
-    // before ->
+    // ver. 1 ->
     ...
     return { success : true }
-    // now ->
+    // ver. 2 ->
     ...
     task.done ({ success : true })
 
@@ -323,10 +357,10 @@ So... about changes:
 ### Transition params
   
 ```js
-    // before ->
+    // ver. 1 ->
     transition ( dependencies, stateData, dt )
 
-    // now ->
+    // ver. 2 ->
     transition ( task, dependencies, stateData, dt )
 
 ```
@@ -373,13 +407,18 @@ So... about changes:
 
 ## Release History
 
+### 2.2.0 (2019-01-20)
+- [x] Fix: Cached transitions are starting before callback functions for already executed transitions;
+- [x] New method 'ignoreCachedUpdates()'. Ignore all cached updates;
+
 ### 2.1.0 (2019-01-19)
-- [x] Export fsm state as object (externalState)
-- [x] Import externalState
+- [x] Export fsm state as an object - externalState;
+- [x] Import externalState;
 - [x] Lock updates during update process execution;
 - [x] Prevent simultaneous updates;
 - [x] Cache new updates during update process execution;
 - [x] Execute cached updates in a row;
+- [] Error: Cached transitions are starting before callback functions for already executed transitions;
 
 ### 2.0.0 (2018-12-01)
 - [x] Transition function could contain asynchronous code;
