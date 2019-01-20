@@ -418,7 +418,7 @@ So... about changes:
 - [x] Prevent simultaneous updates;
 - [x] Cache new updates during update process execution;
 - [x] Execute cached updates in a row;
-- [] Error: Cached transitions are starting before callback functions for already executed transitions;
+- [ ] Error: Cached transitions are starting before callback functions for already executed transitions;
 
 ### 2.0.0 (2018-12-01)
 - [x] Transition function could contain asynchronous code;
