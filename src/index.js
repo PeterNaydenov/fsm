@@ -193,6 +193,7 @@ class Fsm {
                       fsm = this
                     , task = askForPromise ()
                     , key  = `${fsm.state}/${action}`
+                    , cb   = fsm.callback
                     ;
                 fsm.lock = true
                 fsm.transit ( task, key, dt )
@@ -211,7 +212,6 @@ class Fsm {
                                 let 
                                       chainActions = fsm._getChain ( fsm.chainActions, key)
                                     , data = result.response
-                                    , cb   = fsm.callback
                                     ;
                                 
                                 if ( result.success ) {
@@ -237,8 +237,10 @@ class Fsm {
                                            return
                                       }
                                 theUpdate.done ( data )
+                        }) // task onComplete
 
-                                const updateCallbacks = askForPromise ( cb['update'] )
+                theUpdate.onComplete ( data => {
+                                const updateCallbacks = askForPromise ( cb['update'] );
                                 cb [ 'update' ].forEach ( (fn,i) => {
                                                 fn ( fsm.state, data )
                                                 updateCallbacks[i].done ()
@@ -247,7 +249,7 @@ class Fsm {
                                                 fsm.lock = false
                                                 fsm._triggerCacheUpdate ()
                                         })
-                        }) // onComplete
+                        })
                 task.promise.catch ( () =>  console.log ( `Failed in step ${key}`)   )
         }  // updateStep func.
 

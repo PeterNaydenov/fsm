@@ -289,7 +289,7 @@ describe ( 'Finite State Machine', () => {
 
 
                 
-            it ( 'Chain-action on failure', () => {
+            it ( 'Chain-action on failure', done => {
                     const 
                           lib   = {
                                         switchON ( task, dependencies, stateData, dt ) {
@@ -318,6 +318,7 @@ describe ( 'Finite State Machine', () => {
                             () => {
                                     const r = fsm.getState ();
                                     expect ( r ).to.be.equal ( 'alternativeSource' )
+                                    done ()
                                 })
                 }) // it Chain-action on failure
 
@@ -365,12 +366,57 @@ describe ( 'Finite State Machine', () => {
                                 expect ( state ).to.be.equal ( 'alternativeSource' )
                           })
                     fsm.update ( 'activate' )
-                }) // it Alt action on failure
+                }) // it Subscribe for "update", "transition", "positive", "negative"
+    
+    
+
+
+
+              it ( 'Multiple updates', done => {
+                        const 
+                              lib   = {
+                                            switchON ( task, dependencies, stateData, dt ) {
+                                                    setTimeout ( () => task.done ({ success : true, response:dt }), 220 )
+                                                }
+                                            , altOn ( task ) {
+                                                    task.done ({success: true})
+                                                }
+                                            , switchOFF ( task, dependencies, stateData, dt ) {
+                                                    setTimeout ( () => task.done ({ success: true, response: dt }), 180)
+                                                }
+                                    }
+                            , machine = {
+                                              init :  'none'
+                                            , table : [
+                                                        // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
+                                                          [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
+                                                        , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
+                                                        , [ 'active' , 'stop'         , 'none'              , 'switchOFF' ,                            ]
+                                                    ]
+                                    }
+                            ;
+                        const fsm = new Fsm ( machine, lib );
+                        let count = 0;
+                        fsm.on ( 'update', ( state, response ) => {
+                                    if ( count == 0 ) {
+                                          expect ( state ).to.be.equal ( 'active' )
+                                          expect ( response ).to.be.equal ( 'try' )
+                                          count++
+                                          fsm.update ( 'stop', 'second' )
+                                      }
+                                    else {
+                                          expect ( state ).to.be.equal ( 'none' )
+                                          expect ( response ).to.be.equal ( 'second' )
+                                          done ()
+                                      }
+                              })
+                        fsm.update ( 'activate', 'try' )
+                    }) // it Multiple updates
+
     
     
     
-    
-    
+
             it ( 'Prevent simultaneous updates', () => {
                     const 
                         description = {
