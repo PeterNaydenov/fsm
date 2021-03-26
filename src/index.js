@@ -8,7 +8,6 @@ const
 function Fsm ({init, table, stateData, debug }, lib={} ) {
             const 
                   fsm   = this
-                , sData = {...stateData }
                 , fnKeys = Object.keys ( methods )
                 ;
                 
@@ -18,8 +17,8 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
             fsm.cache            = []      // cached 'update' commands
             fsm.askForPromise    = askForPromise
 
-            fsm.stateData        = sData
-            fsm.initialStateData = sData
+            fsm.stateData        = {...stateData }
+            fsm.initialStateData = {...stateData }
             fsm.dependencies     = {}
             fsm.callback = {
                              update     : []
