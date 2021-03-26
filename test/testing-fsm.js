@@ -29,6 +29,7 @@ describe ( 'Finite State Machine', () => {
 
             // Create fsm. Inspect all expected values.
             const fsm = new Fsm ( machine, lib );
+
             fsm.update ( 'activate' )                 // State from 'none' to 'active'
                .then ( () => fsm.update ( 'stop' ))   // Will not change anything. Transition is not defined
                .then ( () => {

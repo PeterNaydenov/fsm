@@ -140,9 +140,9 @@ Only one of the params in this object is required:
  ```js
   { 
       success : true   // Required. Boolean. Transition success;
-    , command : null   // Optional. String|null|undefined. Next action if chaining is required;
     , response : {}    // Optional. Object. update answer response;
     , stateData : {}   // Optional. Object. 'stateData' if there is stateData changes; 
+    , command : null   // Optional. String|null|undefined. Next action if chaining is required (depricated). Use "chainActions" in table instead;
    }
  ```
 
@@ -406,6 +406,11 @@ So... about changes:
 
 
 ## Release History
+
+### 2.2.1 ( 2020-03-26 )
+- [x] Internal code refactoring. 
+
+
 
 ### 2.2.0 (2019-01-20)
 - [x] Fix: Cached transitions are starting before callback functions for already executed transitions;
