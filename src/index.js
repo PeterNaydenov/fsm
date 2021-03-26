@@ -2,14 +2,14 @@
 const 
          MISSING_STATE = 'N/A'
        , askForPromise  = require ( 'ask-for-promise' )
-       , fn = require ( './modules/index' )
+       , methods = require ( './methods/index' )
        ;
-class Fsm {
-    constructor ({init, table, stateData, debug }, lib={} ) {
+
+function Fsm ({init, table, stateData, debug }, lib={} ) {
             const 
                   fsm   = this
                 , sData = {...stateData }
-                , fnKeys = Object.keys ( fn )
+                , fnKeys = Object.keys ( methods )
                 ;
                 
             fsm.state            = init || MISSING_STATE
@@ -28,15 +28,15 @@ class Fsm {
                            , negative   : []
                         }
 
-            fnKeys.forEach ( k => fsm[k] = fn[k](fsm )   )   // Attach methods to fsm
+            fnKeys.forEach ( k => fsm[k] = methods[k](fsm )   )   // Attach methods to fsm
 
-            const result = fsm._setTransitions ( table, lib );
-            if ( debug )   fsm._warn ( result.transitions )
-            fsm.transitions = result.transitions
-            fsm.nextState   = result.nextState
-            fsm.chainActions  = result.chainActions
-        } // constructor func.  
-} // class Fsm
+            const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
+            if ( debug )   fsm._warn ( transitions )
+            fsm.transitions   = transitions
+            fsm.nextState     = nextState
+            fsm.chainActions  = chainActions
+} // Fsm func.  
+
 
 
 
