@@ -407,7 +407,7 @@ So... about changes:
 
 ## Release History
 
-### 2.2.2 ( 2020-03-26 )
+### 2.2.2 ( 2021-03-26 )
 - [x] Internal code refactoring. 
 
 
