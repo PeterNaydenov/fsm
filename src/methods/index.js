@@ -5,6 +5,7 @@ const
   , _transit             = require ( './_transit'            ) 
   , _getChain            = require ( './_getChain'           )
   , _triggerCacheUpdate  = require ( './_triggerCacheUpdate' )
+  , _onUpdateTask        = require ( './_onUpdateTask'       )
 
   , setDependencies     = require ( './setDependencies'    )
   , on                  = require ( './on'                 )
@@ -27,6 +28,7 @@ const fn = {
             , _transit            // Executes a transition if it is defined
             , _getChain           // Returns chainAction for the key if available
             , _triggerCacheUpdate // Call next transition from the cache
+            , _onUpdateTask       // Executes on update success. Used in "update" and "_triggerCacheUpdate"
 // *** Public methods
             , setDependencies          // Add objects in dependencies
             , on                       // Register callback functions on: 'update', 'transition', 'negative', 'positive'

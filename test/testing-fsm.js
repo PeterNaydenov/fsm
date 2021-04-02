@@ -369,7 +369,42 @@ describe ( 'Finite State Machine', () => {
                     fsm.update ( 'activate' )
                 }) // it Subscribe for "update", "transition", "positive", "negative"
     
-    
+
+
+
+
+              it ( 'Subscribe for update with chainActions', () => { 
+                        const 
+                              machine = {
+                                          init :  'none'
+                                        , table : [
+                                                    // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
+                                                      [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
+                                                    , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
+                                                    , [ 'active' , 'stop'         , 'none'              , 'switchOFF' ,                            ]
+                                                ]
+                                  }
+                              , lib = {
+                                            switchOn ( task, dependencies, stateData, data ) {
+                                                  task.done ({ success : false, response: 'switchON' })
+                                                }
+                                          , altOn ( task, dependencies, stateData, data ) {
+                                                    task.done ({ success : true, response: 'altON'})
+                                               } 
+                                      }
+                              ;
+                            let counter = 0;
+
+                            const fsm = new Fsm ( machine, lib );
+                            fsm.on ( 'update', (state, data) => {
+                                                        counter ++
+                                                        expect ( counter ).to.be.equal ( 1 )
+                                    })
+                            fsm.update ( 'activate' )
+                  })  // it subscribe for update with chainActions
+
+
+
 
 
 
@@ -383,7 +418,7 @@ describe ( 'Finite State Machine', () => {
                                                     task.done ({success: true})
                                                 }
                                             , switchOFF ( task, dependencies, stateData, dt ) {
-                                                    setTimeout ( () => task.done ({ success: true, response: dt }), 180)
+                                                    setTimeout ( () => task.done ({ success: true, response: dt }), 90 )
                                                 }
                                     }
                             , machine = {
@@ -391,8 +426,8 @@ describe ( 'Finite State Machine', () => {
                                             , table : [
                                                         // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
                                                           [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
-                                                        , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
-                                                        , [ 'active' , 'stop'         , 'none'              , 'switchOFF' ,                            ]
+                                                        , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'                                  ]
+                                                        , [ 'active' , 'stop'         , 'none'              , 'switchOFF'                              ]
                                                     ]
                                     }
                             ;

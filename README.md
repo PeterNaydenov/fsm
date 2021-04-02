@@ -407,8 +407,12 @@ So... about changes:
 
 ## Release History
 
+### 2.2.3 ( 2021-04-02 )
+- [x] Fix: Duplicated update callback if logic contain a chainAction.
+
 ### 2.2.2 ( 2021-03-26 )
 - [x] Internal code refactoring. 
+- [ ] Bug: Duplicated update callback if logic contain a chainAction.
 
 
 

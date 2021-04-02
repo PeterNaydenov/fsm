@@ -6,7 +6,9 @@ return function () {
                                         if ( i != 0 )   res.push(el)
                                         return res
                                 },[] )
+
                 fsm._updateStep ( updateTask, action, dt )
+                updateTask.onComplete ( data => fsm._onUpdateTask ( data )   )
             }
 }}  // _triggerCacheUpdate func.
 

@@ -23,7 +23,7 @@ return function ( updateTask, action, dt ) {
                           chainActions = fsm._getChain ( fsm.chainActions, key)
                         , data = result.response
                         ;
-                        
+                
                     if ( result.success ) {
                             fsm.state = fsm.nextState [ key ]
                             if ( result.stateData )   fsm.stateData = result.stateData
@@ -49,17 +49,6 @@ return function ( updateTask, action, dt ) {
                     updateTask.done ( data )
             }) // task onComplete
 
-    updateTask.onComplete ( data => {
-                    const updateCallbacks = fsm.askForPromise ( cb['update'] );
-                    cb [ 'update' ].forEach ( (fn,i) => {
-                                    fn ( fsm.state, data )
-                                    updateCallbacks[i].done ()
-                            })
-                    updateCallbacks.onComplete ( x => {
-                                    fsm.lock = false
-                                    fsm._triggerCacheUpdate ()
-                            })
-            })
     task.promise.catch ( () =>  console.log ( `Failed in step ${key}`)   )
 }}  // updateStep func.
 
