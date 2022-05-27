@@ -1,7 +1,8 @@
 function reset ( fsm ) {
 return function () {
+    const { walk } = fsm.dependencies;
     fsm.state = fsm.initialState
-    fsm.stateData = fsm.initialStateData
+    fsm.stateData = walk ( fsm.initialStateData )
 }} // reset func.
 
 

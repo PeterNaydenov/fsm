@@ -2,14 +2,12 @@
 const 
          MISSING_STATE = 'N/A'
        , askForPromise  = require ( 'ask-for-promise' )
-       , methods = require ( './methods/index' )
+       , methods        = require ( './methods/index' )
+       , walk           = require ( '@peter.naydenov/walk' )
        ;
 
 function Fsm ({init, table, stateData, debug }, lib={} ) {
-            const 
-                  fsm   = this
-                , fnKeys = Object.keys ( methods )
-                ;
+            const fsm   = this;
                 
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
@@ -17,9 +15,9 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
             fsm.cache            = []      // cached 'update' commands
             fsm.askForPromise    = askForPromise
 
-            fsm.stateData        = {...stateData }
-            fsm.initialStateData = {...stateData }
-            fsm.dependencies     = {}
+            fsm.stateData        = walk ( stateData ) 
+            fsm.initialStateData = walk ( stateData )
+            fsm.dependencies     = { walk, askForPromise }
             fsm.callback = {
                              update     : []
                            , transition : []
@@ -27,7 +25,7 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
                            , negative   : []
                         }
 
-            fnKeys.forEach ( k => fsm[k] = methods[k](fsm )   )   // Attach methods to fsm
+            walk ( methods, (v,k) => fsm[k] = methods[k](fsm)   )   // Attach methods to fsm
 
             const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
             if ( debug )   fsm._warn ( transitions )

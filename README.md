@@ -407,12 +407,18 @@ So... about changes:
 
 ## Release History
 
+### 2.2.4 ( 2022-05-27 )
+- [x] New dependency was added - walk ("@peter.naydenov/walk")
+- [x] "Walk" is loaded by default in fsm dependency object;
+- [x] "Ask-for-promise" is loaded by default in fsm dependency object;
+- [x] Deep copy for stateData on each update with "walk" library;
+
 ### 2.2.3 ( 2021-04-02 )
-- [x] Fix: Duplicated update callback if logic contain a chainAction.
+- [x] Fix: Duplicated update callback if logic contain a chainAction;
 
 ### 2.2.2 ( 2021-03-26 )
-- [x] Internal code refactoring. 
-- [ ] Bug: Duplicated update callback if logic contain a chainAction.
+- [x] Internal code refactoring; 
+- [ ] Bug: Duplicated update callback if logic contain a chainAction;
 
 
 

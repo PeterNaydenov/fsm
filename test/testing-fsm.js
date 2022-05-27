@@ -56,7 +56,34 @@ describe ( 'Finite State Machine', () => {
 
 
 
-        it ( 'Read "stateData" from transition function. Provide update-response.', () => {
+    it ( 'Default dependencies', () => {
+                // SETUP - provide machine description and transition library.
+                const 
+                        lib   = {
+                                    switchON ( task, dependencies, stateData, dt ) {
+                                            setTimeout ( () => task.done ({ success : true }),   100 ) 
+                                        } // switchOn func.
+                            }
+                      , machine = {
+                                    init  : 'none'
+                                  , table : [
+                                                // [ fromState, action,  nextState, transition, chainActions(optional)  ]
+                                                  [ 'none',   'activate', 'active', 'switchON'  ]
+                                                , [ 'active', 'stop',     'none',   'switchOFF' ]
+                                            ]
+                              }
+                    ;
+                // Create fsm. Inspect all expected values.
+                const fsm = new Fsm ( machine, lib );
+                expect ( fsm.dependencies ).to.have.property ( 'walk' )
+                expect ( fsm.dependencies ).to.have.property ( 'askForPromise' )
+        }) // it default dependencies
+
+
+
+
+
+    it ( 'Read "stateData" from transition function. Provide update-response.', () => {
         // *** Convert stateData to update-response
             const 
                   lib   = {

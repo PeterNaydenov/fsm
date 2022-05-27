@@ -3,7 +3,8 @@ return function ( task, key, dt ) {   //   ( promiseObj, transitionKey, addition
 // *** Execute transition if exists. Ignore all non-predefined cases
         const
                   dependencies = fsm.dependencies
-                , stateData    = { ...fsm.stateData    }
+                , { walk }     = dependencies
+                , stateData    = walk ( fsm.stateData )
                 , transition   = fsm.transitions [ key ]
                 ;
         if ( typeof transition === 'function' )   transition ( task, dependencies, stateData, dt )
