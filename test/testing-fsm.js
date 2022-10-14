@@ -2,7 +2,7 @@
 const
        Fsm = require ('../src/index') 
      , chai = require ( 'chai' )
-     , expect = require ( 'expect.js')
+     , expect = chai.expect
      ;
 
 describe ( 'Finite State Machine', () => {

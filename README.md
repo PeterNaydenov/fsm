@@ -407,6 +407,9 @@ So... about changes:
 
 ## Release History
 
+### 3.0.0 (2022-10-14)
+- [x] Dependency "@peter.naydenov/walk" was upgraded to version 3.0.0;
+
 ### 2.2.4 ( 2022-05-27 )
 - [x] New dependency was added - walk ("@peter.naydenov/walk");
 - [x] "Walk" is loaded by default in fsm dependency object;
