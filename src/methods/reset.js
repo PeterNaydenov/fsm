@@ -6,6 +6,6 @@ return function () {
 
 
 
-module.exports = reset
+export default reset
 
 

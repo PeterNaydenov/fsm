@@ -10,6 +10,6 @@ return function ( {state, stateData} ) {
 
 
 
-module.exports = importState
+export default importState
 
 

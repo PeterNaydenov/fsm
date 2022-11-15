@@ -1,9 +1,7 @@
+import Fsm from '../src/index.js'
+import { expect } from 'chai'
 
-const
-       Fsm = require ('../src/index') 
-     , chai = require ( 'chai' )
-     , expect = chai.expect
-     ;
+
 
 describe ( 'Finite State Machine', () => {
     

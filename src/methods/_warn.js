@@ -11,6 +11,6 @@ return function ( transitions ) {
 
 
 
-module.exports = _warn
+export default _warn
 
 

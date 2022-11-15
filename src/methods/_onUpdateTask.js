@@ -18,6 +18,6 @@ return function _onUpdateTask ( data ) {
 
 
   
-module.exports = _onUpdateTask
+export default _onUpdateTask
 
 

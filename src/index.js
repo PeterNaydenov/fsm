@@ -1,10 +1,8 @@
+import walk from '@peter.naydenov/walk'
+import methods from './methods/index.js'
+import askForPromise  from 'ask-for-promise'
 
-const 
-         MISSING_STATE = 'N/A'
-       , askForPromise  = require ( 'ask-for-promise' )
-       , methods        = require ( './methods/index' )
-       , walk           = require ( '@peter.naydenov/walk' )
-       ;
+const MISSING_STATE = 'N/A';
 
 function Fsm ({init, table, stateData, debug }, lib={} ) {
             const fsm   = this;
@@ -40,7 +38,6 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
 
 
 
-
-module.exports = Fsm
+export default Fsm
 
 

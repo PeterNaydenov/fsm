@@ -1,22 +1,19 @@
-const
-    _setTransitions      = require ( './_setTransitions'     )
-  , _updateStep          = require ( './_updateStep'         )
-  , _warn                = require ( './_warn'               )
-  , _transit             = require ( './_transit'            ) 
-  , _getChain            = require ( './_getChain'           )
-  , _triggerCacheUpdate  = require ( './_triggerCacheUpdate' )
-  , _onUpdateTask        = require ( './_onUpdateTask'       )
-
-  , setDependencies     = require ( './setDependencies'    )
-  , on                  = require ( './on'                 )
-  , off                 = require ( './off'                )
-  , importState         = require ( './importState'        )
-  , exportState         = require ( './exportState'        )
-  , update              = require ( './update'             )
-  , reset               = require ( './reset'              )
-  , ignoreCachedUpdates = require ( './ignoreCacheUpdates' )
-  , getState            = require ( './getState'           )
-  ;
+import _setTransitions from './_setTransitions.js'
+import _updateStep     from './_updateStep.js'         
+import _warn           from './_warn.js'               
+import _transit        from './_transit.js'            
+import _getChain       from './_getChain.js'           
+import _triggerCacheUpdate from './_triggerCacheUpdate.js' 
+import _onUpdateTask   from './_onUpdateTask.js'       
+import setDependencies from './setDependencies.js'    
+import on              from './on.js'                 
+import off             from './off.js'                
+import importState     from './importState.js'
+import exportState     from './exportState.js'
+import update          from './update.js'     
+import reset           from './reset.js'           
+import ignoreCachedUpdates from './ignoreCacheUpdates.js'
+import getState        from './getState.js'
 
 
 
@@ -43,6 +40,6 @@ const fn = {
 
 
 
-module.exports = fn
+export default fn
 
 

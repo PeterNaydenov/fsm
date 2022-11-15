@@ -7,6 +7,6 @@ return function ( eName, fn) {
 
 
 
-module.exports = on
+export default on
 
 

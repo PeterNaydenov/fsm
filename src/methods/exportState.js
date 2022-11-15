@@ -13,6 +13,6 @@ return function () {
 
 
 
-module.exports = exportState
+export default exportState
 
 

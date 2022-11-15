@@ -4,6 +4,7 @@ return function ( deps ) {
 }} // setDependencies func.
 
 
-module.exports = setDependencies
+
+export default setDependencies
 
 

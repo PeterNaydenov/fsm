@@ -8,6 +8,6 @@ return function () {
 
 
 
-module.exports = ignoreCachedUpdates
+export default ignoreCachedUpdates
 
 

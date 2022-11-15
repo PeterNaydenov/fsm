@@ -54,6 +54,6 @@ return function ( updateTask, action, dt ) {
 
 
 
-module.exports = _updateStep
+export default _updateStep
 
 

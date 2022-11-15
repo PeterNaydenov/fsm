@@ -15,6 +15,6 @@ return function ( action, dt ) {   //   () -> Promise<transitionResponse>
 
 
 
-module.exports = update
+export default update
 
 

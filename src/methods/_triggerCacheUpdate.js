@@ -14,6 +14,6 @@ return function () {
 
 
 
-module.exports = _triggerCacheUpdate
+export default _triggerCacheUpdate
 
 

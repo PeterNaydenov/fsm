@@ -12,6 +12,6 @@ return function ( task, key, dt ) {   //   ( promiseObj, transitionKey, addition
 
 
 
-module.exports = _transit
+export default _transit
 
 

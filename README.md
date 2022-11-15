@@ -54,11 +54,14 @@ npm i @peter.naydenov/fsm
 Add in your script:
 
 ```js
- const Fsm = require ( '@peter.naydenov/fsm' )
+import Fsm from '@peter.naydenov/fsm'
  // init new fsm:
  const fsm = new Fsm ( machine, lib )
 ```
 ... where **machine** is fsm-description and **lib** is a transition-library.
+
+If your project is commonJS, use a dynamic `import` function or use version v.3.0.0 or older.
+
 
 
 ## Fsm Description
@@ -407,8 +410,17 @@ So... about changes:
 
 ## Release History
 
+
+
+### 4.0.0 (2022-11-15)
+- [x] The library become a ES module;
+
+
+
 ### 3.0.0 (2022-10-14)
 - [x] Dependency "@peter.naydenov/walk" was upgraded to version 3.0.0;
+
+
 
 ### 2.2.4 ( 2022-05-27 )
 - [x] New dependency was added - walk ("@peter.naydenov/walk");
@@ -416,8 +428,13 @@ So... about changes:
 - [x] "Ask-for-promise" is loaded by default in fsm dependency object;
 - [x] Deep copy for stateData on each update with "walk" library;
 
+
+
 ### 2.2.3 ( 2021-04-02 )
 - [x] Fix: Duplicated update callback if logic contain a chainAction;
+
+
+
 
 ### 2.2.2 ( 2021-03-26 )
 - [x] Internal code refactoring; 

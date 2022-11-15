@@ -5,6 +5,6 @@ return function () {
 
 
 
-module.exports = getState
+export default getState
 
 

@@ -6,6 +6,6 @@ return function ( eName ) {
 
 
 
-module.exports = off
+export default off
 
 

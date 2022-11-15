@@ -6,6 +6,6 @@ return function ( chainActions, key ) {
 
 
 
-module.exports = _getChain
+export default _getChain
 
 

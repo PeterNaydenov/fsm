@@ -39,6 +39,6 @@ function _isAltValid ( alt ) {   //   (altAction) -> boolean
        
 
 
-module.exports  = _setTransitions        
+export default _setTransitions
 
 
