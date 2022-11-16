@@ -411,6 +411,8 @@ So... about changes:
 ## Release History
 
 
+### 4.0.1 ( 2022-11-16)
+- [x] Walk was removed. Generates a lot of problems with objects in stateData(HTMLElement, Date, URL). StateData is using a shallow copy. Developer should take care of immutability himself;
 
 ### 4.0.0 (2022-11-15)
 - [x] The library become a ES module;

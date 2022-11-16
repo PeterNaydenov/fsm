@@ -1,10 +1,11 @@
 function importState (fsm) {
-return function ( {state, stateData} ) {
+return function ( {state, stateData } ) {
 // *** Import existing state to fsm
         if ( state ) {
                     fsm.state = state
-                    fsm.stateData = fsm.___walk ({ data : stateData })
-                    // TODO: test if stateData exist ??!
+                    if ( stateData ) {
+                                fsm.stateData = { ...stateData }
+                        }
             }
 }} // importState func.           
 

@@ -12,10 +12,9 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
             fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
             fsm.cache            = []      // cached 'update' commands
             fsm.askForPromise    = askForPromise
-            fsm.___walk          = walk
 
-            fsm.stateData        = walk ({ data:stateData }) 
-            fsm.initialStateData = walk ({ data:stateData })
+            fsm.stateData        = { ...stateData } 
+            fsm.initialStateData = Object.freeze ({ ...stateData })
             fsm.dependencies     = { walk, askForPromise }
             fsm.callback = {
                              update     : []
@@ -24,10 +23,9 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
                            , negative   : []
                         }
 
-            walk ({   // Attach methods to fsm
-                      data:methods
-                    , keyCallback : ({key:k}) => fsm[k] = methods[k](fsm)   
-                })   
+            for ( let k in methods ) {
+                      fsm[k] = methods[k](fsm)
+                }
 
             const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
             if ( debug )   fsm._warn ( transitions )

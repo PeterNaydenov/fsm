@@ -3,7 +3,7 @@ return function () {
     // *** Export internal flags and state as an object
             const 
                   state     = fsm.state
-                , stateData = fsm.___walk ({ data : fsm.stateData })
+                , stateData = { ...fsm.stateData }
                 ;
             return {
                       state
