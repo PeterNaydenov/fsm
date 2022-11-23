@@ -1,6 +1,6 @@
 {
   "name": "@peter.naydenov/fsm",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Simple Finite State Machine",
   "main": "src/index.js",
   "type": "module",
