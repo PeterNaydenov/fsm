@@ -1,5 +1,10 @@
 # FSM (@peter.naydenov/fsm)
 
+![version](https://img.shields.io/github/package-json/v/peterNaydenov/fsm)
+![license](https://img.shields.io/github/license/peterNaydenov/fsm)
+
+
+
 Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.
 ```js
 const myFsm = {
