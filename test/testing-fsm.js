@@ -1,5 +1,5 @@
 import askForPromise from 'ask-for-promise';
-import Fsm from '../src/index.js'
+import Fsm from '../src/main.js'
 import { expect } from 'chai'
 
 
