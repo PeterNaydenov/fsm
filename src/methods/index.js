@@ -5,7 +5,8 @@ import _transit        from './_transit.js'
 import _getChain       from './_getChain.js'           
 import _triggerCacheUpdate from './_triggerCacheUpdate.js' 
 import _onUpdateTask   from './_onUpdateTask.js'       
-import setDependencies from './setDependencies.js'    
+import setDependencies from './setDependencies.js'
+import getDependencies from './getDependencies.js'    
 import on              from './on.js'                 
 import off             from './off.js'                
 import importState     from './importState.js'
@@ -27,7 +28,8 @@ const fn = {
             , _triggerCacheUpdate // Call next transition from the cache
             , _onUpdateTask       // Executes on update success. Used in "update" and "_triggerCacheUpdate"
 // *** Public methods
-            , setDependencies          // Add objects in dependencies
+            , setDependencies          // Add objects to dependencies object
+            , getDependencies          // Returns the dependencies object
             , on                       // Register callback functions on: 'update', 'transition', 'negative', 'positive'
             , off                      // Remove callbacks
             , importState              // Get state and data from outside

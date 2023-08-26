@@ -1,11 +1,15 @@
 import walk from '@peter.naydenov/walk'
+import dtbox from 'dt-toolbox'
 import methods from './methods/index.js'
 import askForPromise  from 'ask-for-promise'
 
 const MISSING_STATE = 'N/A';
 
 function Fsm ({init, table, stateData, debug }, lib={} ) {
-            const fsm   = this;
+            const 
+                  fsm   = this
+                , api = {}
+                ;
                 
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
@@ -15,7 +19,7 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
 
             fsm.stateData        = { ...stateData } 
             fsm.initialStateData = Object.freeze ({ ...stateData })
-            fsm.dependencies     = { walk, askForPromise }
+            fsm.dependencies     = { walk, dtbox, askForPromise }
             fsm.callback = {
                              update     : []
                            , transition : []
@@ -24,14 +28,18 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
                         }
 
             for ( let k in methods ) {
-                      fsm[k] = methods[k](fsm)
+                      if ( k.startsWith('_') )   fsm[k] = methods[k](fsm)
+                      else                       api[k] = methods[k](fsm)
                 }
+
+            if ( debug )   global.debugFSM = fsm
 
             const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
             if ( debug )   fsm._warn ( transitions )
             fsm.transitions   = transitions
             fsm.nextState     = nextState
             fsm.chainActions  = chainActions
+            return api
 } // Fsm func.  
 
 
