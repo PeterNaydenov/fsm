@@ -338,7 +338,140 @@ fsm.update ( 'activate' )
 
 
 
+## Migration from v.1 to v.2
+Project was started with simplest posible implementation. I like the approach and want to extend it. Reasons:
+- Some of my transition function contain asynchronous events; 
+- Describe chain of actions inside the transition condition records;
+- Chain of action on positive and negative transition end;
 
+So... about changes:
+### Transition complete
+- **Version 1**: Transition function should return **transitionResult** object.
+- **Version 2**: Transition function receives as first param **task**. Task is askForPromise object. Transition is complete on `task.done(transitionResult)`.
+- **Changes**: Find return statement and convert it to task.done:
+
+```js
+    // ver. 1 ->
+    ...
+    return { success : true }
+    // ver. 2 ->
+    ...
+    task.done ({ success : true })
+
+```
+
+
+
+### Transition params
+  
+```js
+    // ver. 1 ->
+    transition ( dependencies, stateData, dt )
+
+    // ver. 2 ->
+    transition ( task, dependencies, stateData, dt )
+
+```
+
+- **Change**: Open transition library and add 'task' argument to all transitioin functions.
+
+
+
+### Description table
+- **Version 1**: Transition condition in description table:
+    ```js
+        [ 'state', 'action', 'nextState', 'transitionFx' ]
+    ```
+    All fields are string and are required.
+
+- **Version 2**: Fields in description table record:
+    ```js
+        [ 'state', 'action', 'nextState', 'transitionFx', 'chainActions' ]
+        // chainAction is array [ nextAction, nextAction ]
+        // If we need chaining only on positive/negative result of transition we can use "false"
+        // Example:
+        // We need chain transition only if transition failed:
+        // [ false, nextAction ]
+        // This chainAction will trigger nextAction only if transition failed.
+
+    ```
+  ChainActions is an array with two values. First value represents next action on success transition. 
+  Second on failed transition. ChainAction is optional.
+
+- **Changes**: As ChainActions is an optional parameter, no changes needed.
+
+
+
+### Chaining
+- Version 1:
+    TransitionResult should contain property "command", that will link to next transition.
+- Version 2:
+    TransitionResult with property 'command' still works. Chaining in description-table is more powerfull and will overwrite transitionResult's "command" property.
+- Changes: No changes needed but is much better to describe chains in description table instead in transition functions. Keep all logic flows on one place for easy reading and manipulating.
+
+
+
+
+
+## Release History
+
+
+### 4.0.1 ( 2022-11-16)
+- [x] Walk was removed. Generates a lot of problems with objects in stateData(HTMLElement, Date, URL). StateData is using a shallow copy. Developer should take care of immutability himself;
+
+### 4.0.0 (2022-11-15)
+- [x] The library become a ES module;
+
+
+
+### 3.0.0 (2022-10-14)
+- [x] Dependency "@peter.naydenov/walk" was upgraded to version 3.0.0;
+
+
+
+### 2.2.4 ( 2022-05-27 )
+- [x] New dependency was added - walk ("@peter.naydenov/walk");
+- [x] "Walk" is loaded by default in fsm dependency object;
+- [x] "Ask-for-promise" is loaded by default in fsm dependency object;
+- [x] Deep copy for stateData on each update with "walk" library;
+
+
+
+### 2.2.3 ( 2021-04-02 )
+- [x] Fix: Duplicated update callback if logic contain a chainAction;
+
+
+
+
+### 2.2.2 ( 2021-03-26 )
+- [x] Internal code refactoring; 
+- [ ] Bug: Duplicated update callback if logic contain a chainAction;
+
+
+
+### 2.2.0 (2019-01-20)
+- [x] Fix: Cached transitions are starting before callback functions for already executed transitions;
+- [x] New method 'ignoreCachedUpdates()'. Ignore all cached updates;
+
+### 2.1.0 (2019-01-19)
+- [x] Export fsm state as an object - externalState;
+- [x] Import externalState;
+- [x] Lock updates during update process execution;
+- [x] Prevent simultaneous updates;
+- [x] Cache new updates during update process execution;
+- [x] Execute cached updates in a row;
+- [ ] Error: Cached transitions are starting before callback functions for already executed transitions;
+
+### 2.0.0 (2018-12-01)
+- [x] Transition function could contain asynchronous code;
+- [x] Chain-actions in **transaction conditions** (Optional);
+- [x] Chain-actions are possible on **positive** and *negative* transition-end;
+
+### 1.0.0 (2018-11-21)
+- [x] FSM;
+- [x] Set FSM external dependencies;
+- [x] Chain-actions by using `command` in transition response object;
+- [x] Internal state flags and values with stateData;
 
 
 

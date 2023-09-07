@@ -1,11 +1,14 @@
-import walk from '@peter.naydenov/walk'
-import dtbox from 'dt-toolbox'
+import askForPromise  from 'ask-for-promise'    // Docs: https://github.com/PeterNaydenov/ask-for-promise
+import dtbox from 'dt-toolbox'                  // Docs: https://github.com/PeterNaydenov/dt-toolbox
 import methods from './methods/index.js'
-import askForPromise  from 'ask-for-promise'
 
-const MISSING_STATE = 'N/A';
+const 
+    MISSING_STATE = 'N/A'
+  , walk = dtbox.getWalk ()                   // Docs: https://github.com/PeterNaydenov/walk
+  ;
 
-function Fsm ({init, table, stateData, debug }, lib={} ) {
+
+function Fsm ({init, table, stateData={}, debug }, lib={} ) {
             const 
                   fsm   = this
                 , api = {}
@@ -14,11 +17,8 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
             fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
-            fsm.cache            = []      // cached 'update' commands
-            fsm.askForPromise    = askForPromise
+            fsm.cache            = []      // cached 'update' actions
 
-            fsm.stateData        = { ...stateData } 
-            fsm.initialStateData = Object.freeze ({ ...stateData })
             fsm.dependencies     = { walk, dtbox, askForPromise }
             fsm.callback = {
                              update     : []
@@ -26,21 +26,33 @@ function Fsm ({init, table, stateData, debug }, lib={} ) {
                            , positive   : []
                            , negative   : []
                         }
-
-            for ( let k in methods ) {
-                      if ( k.startsWith('_') )   fsm[k] = methods[k](fsm)
+                        
+            for ( let k in methods ) {   // Separate public and private methods.
+                      if ( k.startsWith('_') )   fsm[k] = methods[k](fsm)  // Methods with '_' are private.
                       else                       api[k] = methods[k](fsm)
                 }
+            
+            
 
-            if ( debug )   global.debugFSM = fsm
+            let linesOfStateData = fsm._setStateData ( stateData, dtbox )
+            fsm.stateData        = dtbox.load ( linesOfStateData ) 
+            fsm.initialStateData = dtbox.load ( linesOfStateData )
 
             const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
-            if ( debug )   fsm._warn ( transitions )
+            if ( debug ) {  
+                        fsm._warn ( transitions )
+                        global.debugFSM = fsm
+                }
+
             fsm.transitions   = transitions
             fsm.nextState     = nextState
             fsm.chainActions  = chainActions
             return api
 } // Fsm func.  
+
+
+
+Fsm.dependencies = { walk, dtbox, askForPromise }
 
 
 

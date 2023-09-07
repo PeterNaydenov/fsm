@@ -1,13 +1,9 @@
-function exportState (fsm) {
-return function () {
+function exportState ( fsm ) {
+return function exportState () {
     // *** Export internal flags and state as an object
-            const 
-                  state     = fsm.state
-                , stateData = { ...fsm.stateData }
-                ;
             return {
-                      state
-                    , stateData
+                      state: fsm.state
+                    , stateData : fsm.stateData.export ()
                  }
 }} // exportState func.
 

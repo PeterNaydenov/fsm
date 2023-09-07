@@ -1,7 +1,8 @@
 function _updateStep ( fsm ) {
 return function ( updateTask, action, dt ) {
     const 
-          task = fsm.askForPromise ()
+          { askForPromise } = fsm.dependencies
+        , task = askForPromise ()
         , key  = `${fsm.state}/${action}`
         , cb   = fsm.callback
         ;
@@ -18,15 +19,15 @@ return function ( updateTask, action, dt ) {
                      *     ? command   - string. Next action if function-chaining. (depricated!) Use a chainAction inside the logic table
                      *  }
                      */
-                    
+
                     let 
                           chainActions = fsm._getChain ( fsm.chainActions, key)
                         , data = result.response
                         ;
-                
                     if ( result.success ) {
                             fsm.state = fsm.nextState [ key ]
-                            if ( result.stateData )   fsm.stateData = result.stateData
+                            if ( result.stateData != null   )   fsm.stateData = fsm._updateStateData ( fsm.stateData, result.stateData ) 
+                        
                             cb [ 'positive'   ].forEach ( fn => fn ( fsm.state, data)   )
                             cb [ 'transition' ].forEach ( fn => fn ( fsm.state, data)   )
                             if ( chainActions && chainActions[0] ) {
@@ -42,10 +43,6 @@ return function ( updateTask, action, dt ) {
                                     return
                                }
                          }
-                    if ( result.command ) {
-                               fsm._updateStep ( updateTask, result.command, data )
-                               return
-                          }
                     updateTask.done ( data )
             }) // task onComplete
 
