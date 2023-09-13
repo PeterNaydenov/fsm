@@ -1,9 +1,14 @@
 'use strict'
 
-function updateStateData ( fsm ) {
-return function updateStateData ( stateData, updateObject ) {
-        const { dtbox } = fsm.dependencies;
-
+function _updateStateData ( fsm ) {
+/**
+ * Updates the state data.
+ * @param {dt-object} stateData - The fsm state data.
+ * @param {object} updateObject - The update object.
+ * @returns {dt-object}         - The updated state data.
+ */
+return function _updateStateData ( stateData, updateObject ) {
+        const { dtbox, query } = fsm.dependencies;
         // Recognize the updateObject type: dt-object, dt-model or javascript object;
         let updateType = 'javascriptObject';
         if ( updateObject.export )   updateType = 'dtObject'
@@ -21,25 +26,16 @@ return function updateStateData ( stateData, updateObject ) {
                 console.error ( 'State update failed. Reason: Received an array. Expectation: Object where top-level property name is the name of the data segment.' )
                 return
             }
+            
         // Setup the update segments and root object of dt-model
-        if ( ['javascriptObject'].includes(updateType)            )   updateObject =  fsm._setStateData(updateObject)
-        if ( ['javascriptObject','dt-model'].includes(updateType) )   updateObject = dtbox.load ( updateObject )
-        
-        
-        const root = Object.assign ( {}, stateData.export('root')[0][1], updateObject.export('root')[0][1] )
-        const newState = dtbox.init ( root )
-        stateData.listSegments ()
-                 .forEach ( segmentName => {
-                                if ( segmentName === 'root' )   return
-                                let segmentUpdate = updateObject.export(segmentName);
-                                if ( segmentUpdate.length === 0 )   newState.insertSegment ( segmentName, stateData.export ( segmentName )   )  
-                                else                                newState.insertSegment ( segmentName, segmentUpdate ) 
-                        })
-        return newState
-}} // updateStateData func.
+        if ( ['javascriptObject'].includes(updateType)            )   updateObject = dtbox.init ( updateObject ).export ()
+        if ( ['javascriptObject','dt-model'].includes(updateType) )   updateObject = dtbox.load ( updateObject ).query ( query.splitSegments )
+        // Update the state data
+        return stateData.query ( query.updateState, updateObject )
+}} // _updateStateData func.
 
 
 
-export default updateStateData
+export default _updateStateData
 
 

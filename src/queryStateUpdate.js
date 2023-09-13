@@ -1,7 +1,5 @@
 'use strict'
 
-import { update } from "@peter.naydenov/dt-queries";
-
 
 
 function queryStateUpdate ( fsm ) {

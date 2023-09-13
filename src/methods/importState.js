@@ -1,11 +1,12 @@
 function importState (fsm) {
 return function ( {state, stateData } ) {
 // *** Import existing state to fsm
-const { dtbox } = fsm.dependencies;
+const { dtbox, query } = fsm.dependencies;
         if ( state ) {
                     fsm.state = state
                     if ( stateData ) {
-                                fsm.stateData = dtbox.load ( stateData )
+                                const update = dtbox.load ( stateData ).query ( query.splitSegments )
+                                fsm.stateData = fsm.stateData.query ( query.updateState, update )
                         }
             }
 }} // importState func.           

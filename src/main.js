@@ -1,9 +1,14 @@
 import askForPromise  from 'ask-for-promise'    // Docs: https://github.com/PeterNaydenov/ask-for-promise
 import dtbox from 'dt-toolbox'                  // Docs: https://github.com/PeterNaydenov/dt-toolbox
+import { 
+      splitSegments
+    , joinSegments
+    , updateState 
+       } from '@peter.naydenov/dt-queries'     // Docs: https://github.com/PeterNaydenov/dt-queries
 import methods from './methods/index.js'
 
 const 
-    MISSING_STATE = 'N/A'
+    MISSING_STATE = 'N/A'                     // State name if not defined
   , walk = dtbox.getWalk ()                   // Docs: https://github.com/PeterNaydenov/walk
   ;
 
@@ -19,7 +24,13 @@ function Fsm ({init, table, stateData={}, debug }, lib={} ) {
             fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
             fsm.cache            = []      // cached 'update' actions
 
-            fsm.dependencies     = { walk, dtbox, askForPromise }
+            fsm.dependencies = { 
+                                walk
+                              , dtbox
+                              , askForPromise
+                              , query : { splitSegments, joinSegments, updateState } 
+                            }
+
             fsm.callback = {
                              update     : []
                            , transition : []
@@ -32,11 +43,8 @@ function Fsm ({init, table, stateData={}, debug }, lib={} ) {
                       else                       api[k] = methods[k](fsm)
                 }
             
-            
-
-            let linesOfStateData = fsm._setStateData ( stateData, dtbox )
-            fsm.stateData        = dtbox.load ( linesOfStateData ) 
-            fsm.initialStateData = dtbox.load ( linesOfStateData )
+            fsm.stateData        = dtbox.init ( stateData ).query ( splitSegments )
+            fsm.initialStateData = dtbox.init ( stateData ).query ( splitSegments )
 
             const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
             if ( debug ) {  

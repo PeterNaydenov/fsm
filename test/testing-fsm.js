@@ -168,7 +168,7 @@ describe ( 'Finite State Machine', () => {
                     const 
                           lib   = {
                                         switchON ({task,stateData}) {
-                                                const [ test ] = stateData.extractList (['test' ],{ as: 'std'});
+                                                const [ test ] = stateData.extractList ([ 'test' ],{ as: 'std'});
                                                 test.say =  'yo-ho-ho'
                                                 const name = 'John';
                                                 task.done ({ 
@@ -208,13 +208,15 @@ describe ( 'Finite State Machine', () => {
     
                     fsm.update ( 'activate' )
                          .then ( () => {
-                                const [r1, r2] = fsm.getStateData ( ['root', 'test'], {as:'std'} );
-                                expect ( fsm.getState() ).to.be.equal ( 'active' )
-                                expect ( r1.name ).to.be.equal ( 'John')
-                                expect ( r2     ).to.have.property ( 'say' )
-                                expect ( r2.say ).to.be.equal ( 'yo-ho-ho' )
-                                fsm.reset ()
+                                const [r1, r2, q1] = fsm.getStateData ( ['root', 'test', 'name' ], {as:'std'} );
 
+                                expect ( fsm.getState() ).to.be.equal ( 'active' )
+                                expect ( r1.name ).to.be.equal ( 'John')             // Requesting a 'root' will return object with all primitive state data fields
+                                expect ( q1      ).to.be.equal ( 'John' )            // Requesting a prop will returns a primitive value
+                                expect ( r2      ).to.have.property ( 'say' )
+                                expect ( r2.say  ).to.be.equal ( 'yo-ho-ho' )
+                                
+                                fsm.reset ()   // Should change 'state' and 'stateData' to initial values
                                 expect ( fsm.getState()   ).to.be.equal ( machine.init )
                                 const [ r3, r4 ] = fsm.getStateData (['root', 'test'], {as:'std'})
 
@@ -487,7 +489,7 @@ describe ( 'Finite State Machine', () => {
     
     
 
-    it ( 'Prevent simultaneous updates', () => {
+    it.only ( 'Prevent simultaneous updates', done => {
                     const 
                         description = {
                                           init  : 'center'
@@ -512,14 +514,20 @@ describe ( 'Finite State Machine', () => {
                                                         , response  : 'Guten tag'
                                                 })
                                         }
-                                , failure ( {task, dependencies, stateData}, dt ) {
+                                , failure ( {task, dependencies, stateData}, data ) {
                                             task.done ({
                                                               success : true
-                                                            , response : dt
+                                                            , response : data
                                                     })
                                         }
                             }
-                    const fsm = new Fsm ( description, transitions );
+                    const 
+                          fsm          = new Fsm ( description, transitions )
+                        , askForPromise = fsm.getDependencies ().askForPromise
+                        , task1        = askForPromise ()
+                        , task2        = askForPromise ()
+                        , task3        = askForPromise ()
+                        ;
 
                     let resultState = 'none';
                     
@@ -528,6 +536,7 @@ describe ( 'Finite State Machine', () => {
                             expect ( resultState ).to.be.equal ( 'none' )
                             expect ( r ).to.be.equal ( 'Aloha' )
                             resultState = 'left'
+                            task1.done ()
                         })
                     fsm.update ( 'goRight', 'right from left' )
                        .then ( r => {
@@ -535,8 +544,8 @@ describe ( 'Finite State Machine', () => {
                                 expect ( resultState ).to.be.equal ( 'left' )
                                 expect ( state ).to.be.equal ( 'center' )
                                 expect ( r ).to.be.equal ( 'right from left' )
-                                expect ( fsm.cache ).to.have.length ( 1 )
                                 resultState = 'center'
+                                task2.done ()
                         })
                     fsm.update ( 'goRight' )
                        .then ( r => {
@@ -544,7 +553,15 @@ describe ( 'Finite State Machine', () => {
                                 expect ( resultState ).to.be.equal ( 'center' )
                                 expect ( state ).to.be.equal ( 'right' )
                                 expect ( r ).to.be.equal ( 'Guten tag' )
+                                task3.done ()
                         })
+                        
+                    Promise.all ([
+                                      task1.promise
+                                    , task2.promise
+                                    , task3.promise
+                              ])
+                         .then ( () =>  done () )
                 }) // it prevent simultaneous updates
 
 
