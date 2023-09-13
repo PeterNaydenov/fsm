@@ -1,7 +1,5 @@
 'use strict'
 
-
-
 function queryStateUpdate ( fsm ) {
 return function queryStateUpdate ( stateData, updateObject ) {
         const { dtbox } = fsm.dependencies;

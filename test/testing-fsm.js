@@ -489,7 +489,7 @@ describe ( 'Finite State Machine', () => {
     
     
 
-    it.only ( 'Prevent simultaneous updates', done => {
+    it ( 'Prevent simultaneous updates', done => {
                     const 
                         description = {
                                           init  : 'center'
