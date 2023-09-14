@@ -16,7 +16,6 @@ return function ( updateTask, action, dt ) {
                      *       success   - boolean. Is it transition successful.
                      *     ? stateData - object. Flat object with fsm state values.
                      *     ? response  - object. External data as response of transition if needed.
-                     *     ? command   - string. Next action if function-chaining. (depricated!) Use a chainAction inside the logic table
                      *  }
                      */
 
