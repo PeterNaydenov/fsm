@@ -5,17 +5,13 @@
 - [x] stateData is a dt-object;
 - [x] Transition functions have different arrangment of arguments;
 - [x] Transition functions can receive multiple data arguments(single is still the preference);
-- [x] Transition functions can update only defined stateData; // TODO: Describe it better
-- [x] Method `exportState` will return an object with two properties: `state` and `stateData`. `state` is a string. `stateData` is a dt-model. Method `importState` expect exact same object as argument;
+- [x] Transition functions can update only defined stateData fields. Not defined data-segments or properties will be ignored;
+- [x] Method `exportState` will return an object with two properties: `state` and `stateData`. `state` is a string. `stateData` is a DT-model. Method `importState` expect exact same object as argument;
 - [x] Result.command was removed permanently from the code;
-- [x] New method: `getStateData` returns a list of requested stateData properties;
+- [x] New method: `extractList` returns a list of requested stateData properties;
 - [x] Internal fsm data is hidden. Only public methods are available;
-- [x] TODO: Here are new methods that I should look `_setStateData`, '_updateStateData', getStateData;
+- [x] TODO: Here are new methods that I should look `_setStateData`, '_updateStateData', extractList;
 ## TASKS dt-toolbox (simplify fsm code)
-1. `Import` should check for existing stateData properties. If property is missing, should be ignored;
-2. Need a query functions to transit data in both direction: 
-- from normal nestled structure to list of data-fragments: state;
-- from list of data-fragments(state) to normal nestled structure;
 3. Definition for state: Object that become a container for data-segments. Properties that have a primitive values will become properties of the root segment;
 
 

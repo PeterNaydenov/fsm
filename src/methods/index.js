@@ -18,7 +18,7 @@ import update              from './update.js'
 import reset               from './reset.js'           
 import ignoreCachedUpdates from './ignoreCacheUpdates.js'
 import getState            from './getState.js'
-import getStateData        from './getStateData.js'
+import extractList        from './extractList.js'
 
 
 
@@ -44,7 +44,7 @@ const fn = {
             , reset                    // Change state and stateData to initial values
             , ignoreCachedUpdates      // Disable update records in the cache
             , getState                 // Return a state value
-            , getStateData             // Return a stateData values
+            , extractList              // Return a stateData values
         }
 
 

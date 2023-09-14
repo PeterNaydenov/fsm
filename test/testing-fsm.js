@@ -208,7 +208,7 @@ describe ( 'Finite State Machine', () => {
     
                     fsm.update ( 'activate' )
                          .then ( () => {
-                                const [r1, r2, q1] = fsm.getStateData ( ['root', 'test', 'name' ], {as:'std'} );
+                                const [r1, r2, q1] = fsm.extractList ( ['root', 'test', 'name' ], {as:'std'} );
 
                                 expect ( fsm.getState() ).to.be.equal ( 'active' )
                                 expect ( r1.name ).to.be.equal ( 'John')             // Requesting a 'root' will return object with all primitive state data fields
@@ -218,7 +218,7 @@ describe ( 'Finite State Machine', () => {
                                 
                                 fsm.reset ()   // Should change 'state' and 'stateData' to initial values
                                 expect ( fsm.getState()   ).to.be.equal ( machine.init )
-                                const [ r3, r4 ] = fsm.getStateData (['root', 'test'], {as:'std'})
+                                const [ r3, r4 ] = fsm.extractList (['root', 'test'], {as:'std'})
 
                                 expect ( r3.name ).to.be.equal ( 'Peter' )
                                 expect ( r4.say  ).to.be.equal ( 'hi' )
@@ -561,7 +561,7 @@ describe ( 'Finite State Machine', () => {
                                     , task2.promise
                                     , task3.promise
                               ])
-                         .then ( () =>  done () )
+                         .then ( () =>  done ()   )
                 }) // it prevent simultaneous updates
 
 
@@ -643,7 +643,7 @@ describe ( 'Finite State Machine', () => {
                             })
                     
                     expect ( fsm.getState() ).to.be.equal ( 'imported' )
-                    const [ r1 ] = fsm.getStateData ( ['in'], {as:'std'})
+                    const [ r1 ] = fsm.extractList ( ['in'], {as:'std'})
                     expect ( r1 ).to.be.true
         }) // it Import externalState
 
@@ -702,7 +702,7 @@ describe ( 'Finite State Machine', () => {
                                   }
                               , x => {   //---> ignoreCachedUpdates should move logic here. X will contain error message produced by fsm.
                                           result = fsm.exportState ()
-                                          const [ r1, r2 ] = fsm.getStateData (['yo', 'wrong'],{as:'std'})
+                                          const [ r1, r2 ] = fsm.extractList (['yo', 'wrong'],{as:'std'})
                                           expect ( result.state ).to.be.equal ( 'initial' )
                                           expect ( r1 ).to.be.equal ( 'hello' )
                                           expect ( r2 ).to.be.false
