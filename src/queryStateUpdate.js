@@ -2,11 +2,11 @@
 
 function queryStateUpdate ( fsm ) {
 return function queryStateUpdate ( stateData, updateObject ) {
-        const { dtbox } = fsm.dependencies;
+        const { dtbox, query } = fsm.dependencies;
 
         // Recognize the updateObject type: dt-object, dt-model or javascript object;
         let updateType = 'javascriptObject';
-        if ( updateObject.export )   updateType = 'dtObject'
+        if ( updateObject.export )   updateType = 'dt-object'
         if ( 
                 updateObject instanceof Array &&
                 updateObject[0] === updateObject[3] &&
@@ -21,21 +21,14 @@ return function queryStateUpdate ( stateData, updateObject ) {
                 console.error ( 'State update failed. Reason: Received an array. Expectation: Object where top-level property name is the name of the data segment.' )
                 return
             }
+            
         // Setup the update segments and root object of dt-model
-        if ( ['javascriptObject'].includes(updateType)            )   updateObject =  fsm._setStateData(updateObject)
-        if ( ['javascriptObject','dt-model'].includes(updateType) )   updateObject = dtbox.load ( updateObject )
+        if ( ['javascriptObject'].includes(updateType)                          )   updateObject =  dtbox.init(updateObject).export ()
+        if ( ['javascriptObject','dt-model'].includes(updateType)               )   updateObject = dtbox.load ( updateObject )
+        if ( ['javascriptObject','dt-model', 'dt-object' ].includes(updateType) )   updateObject = updateObject.query ( query.splitSegments )
+
+        return stateData.query ( query.updateState, updateObject )
         
-        
-        const root = Object.assign ( {}, stateData.export('root')[0][1], updateObject.export('root')[0][1] )
-        const newState = dtbox.init ( root )
-        stateData.listSegments ()
-                 .forEach ( segmentName => {
-                                if ( segmentName === 'root' )   return
-                                let segmentUpdate = updateObject.export(segmentName);
-                                if ( segmentUpdate.length === 0 )   newState.insertSegment ( segmentName, stateData.export ( segmentName )   )  
-                                else                                newState.insertSegment ( segmentName, segmentUpdate ) 
-                        })
-        return newState
 }} // queryStateUpdate func.
 
 

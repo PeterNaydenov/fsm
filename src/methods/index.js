@@ -1,5 +1,5 @@
 import _setTransitions  from './_setTransitions.js'
-import _setStateData    from './_setStateData.js'
+
 import _updateStateData from './_updateStateData.js'
 import _updateStep      from './_updateStep.js'         
 import _warn            from './_warn.js'               
@@ -25,7 +25,6 @@ import extractList        from './extractList.js'
 const fn = {
 // *** "Private" methods
               _setTransitions     // Convert machine configuration and transition library in a internal fsm structures
-            , _setStateData       // Prepare stateData dt-object
             , _updateStateData    // Update stateData dt-object
             , _updateStep         // Process results of transitions
             , _warn               // Warn on issues if "debug:true" in machine configuration

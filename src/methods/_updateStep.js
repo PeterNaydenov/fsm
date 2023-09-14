@@ -26,7 +26,7 @@ return function ( updateTask, action, dt ) {
                         ;
                     if ( result.success ) {
                             fsm.state = fsm.nextState [ key ]
-                            if ( result.stateData != null   )   fsm.stateData = fsm._updateStateData ( fsm.stateData, result.stateData ) 
+                            if ( result.stateData != null   )   fsm.stateData = fsm._updateStateData ( result.stateData ) 
                         
                             cb [ 'positive'   ].forEach ( fn => fn ( fsm.state, data)   )
                             cb [ 'transition' ].forEach ( fn => fn ( fsm.state, data)   )

@@ -10,9 +10,8 @@
 - [x] Result.command was removed permanently from the code;
 - [x] New method: `extractList` returns a list of requested stateData properties;
 - [x] Internal fsm data is hidden. Only public methods are available;
-- [x] TODO: Here are new methods that I should look `_setStateData`, '_updateStateData', extractList;
-## TASKS dt-toolbox (simplify fsm code)
-3. Definition for state: Object that become a container for data-segments. Properties that have a primitive values will become properties of the root segment;
+- [x] TODO: Here are new methods that I should look  '_updateStateData', extractList;
+
 
 
 
