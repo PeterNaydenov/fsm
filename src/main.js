@@ -15,7 +15,7 @@ const
 
 function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib={} ) {
             const 
-                  fsm   = this
+                  fsm = this
                 , api = {}
                 ;
                 
@@ -43,7 +43,7 @@ function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib
                       if ( k.startsWith('_') )   fsm[k] = methods[k](fsm)  // Methods with '_' are private.
                       else                       api[k] = methods[k](fsm)
                 }
-            
+            fsm.api = api
             fsm.stateData        = dtbox.init ( stateData ).query ( splitSegments )
             fsm.initialStateData = dtbox.init ( stateData ).query ( splitSegments )
 

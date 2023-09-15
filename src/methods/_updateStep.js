@@ -1,13 +1,14 @@
 function _updateStep ( fsm ) {
-return function ( updateTask, action, dt ) {
+return function ( updateTask, action, data ) {
     const 
           { askForPromise } = fsm.dependencies
         , task = askForPromise ()
         , key  = `${fsm.state}/${action}`
-        , cb   = fsm.callback
+        , cb   = fsm.callback   // Event-based callbacks
         ;
+
     fsm.lock = true
-    fsm._transit ( task, key, dt )
+    fsm._transit ( task, key, data )
     task.onComplete (
             result => {
                     /**
