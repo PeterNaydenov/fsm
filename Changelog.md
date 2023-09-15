@@ -16,7 +16,6 @@
 - [x] TODO: Here are new methods that I should look  '_updateStateData', extractList;
 
 ## TODO:
-- Default extraction model for stateData ;
 - FSM-hub should be alligned with the new version;
 - method: explore: 
       -> list -> returns list of what is provided as second argument[ 'states', 'actions', 'state/action' ] 
