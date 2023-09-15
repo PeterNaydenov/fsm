@@ -61,7 +61,12 @@ function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib
 
 
 
-Fsm.dependencies = { walk, dtbox, askForPromise, query : { splitSegments, joinSegments, updateState } }
+Fsm.dependencies = { 
+                      walk
+                    , dtbox
+                    , askForPromise
+                    , query : { splitSegments, joinSegments, updateState }
+                  }
 
 
 
