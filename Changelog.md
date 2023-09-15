@@ -2,11 +2,12 @@
 
 ### 5.0.0 (2023-09-20... )
 - [x] All default dependencies are available on top level: Fsm.dependencies;
-- [x] stateData is a dt-object;
+- [x] stateData is a dt-object(uses dt-toolbox library);
 - [x] Transition functions have different arrangment of arguments;
 - [x] Transition functions can receive multiple data arguments(single is still the preference);
 - [x] Transition functions can update only defined stateData fields. Not defined data-segments or properties will be ignored;
 - [x] Method `exportState` returns an object with two properties: `state` and `stateData`. `state` is a string. `stateData` is a DT-model. Method `importState` expect exact same object as argument;
+- [x] Method `importState` will filter the imported stateData to only predefined fields;
 - [x] Transion result.command was removed permanently from the code;
 - [x] New method: `extractList` returns a list of requested stateData properties;
 - [x] Internal fsm data is hidden. Only public methods are available;

@@ -15,7 +15,7 @@ return function () {   //  -> void
                                 if ( list.length == 0 ) {   // It's a debug case. Return all data to see what is available.
                                                 const query = fsm.dependencies.query;
                                                 return stateData.query ( query.joinSegments ).model (() => ({as:'std'}))
-                                                // Note: Don't use it in prouduction. Only for debugging during the development.
+                                                // Note: Don't use it in production. Only for debugging during the development.
                                     }
                                 if ( options )   return stateData.extractList( list, options )
                                 else             return stateData.extractList( list, {as:fsm.stateDataFormat} )

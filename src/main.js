@@ -21,9 +21,9 @@ function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib
                 
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
-            fsm.stateDataFormat  = stateDataFormat
-            fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
-            fsm.cache            = []      // cached 'update' actions
+            fsm.stateDataFormat  = stateDataFormat   // Used in 'extractList' methods (library and transitions).
+            fsm.lock             = false             // Switch 'ON' during transition in progress. Write other updates in cache.
+            fsm.cache            = []                // cached 'update' actions
 
             fsm.dependencies = { 
                                 walk
@@ -61,7 +61,7 @@ function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib
 
 
 
-Fsm.dependencies = { walk, dtbox, askForPromise }
+Fsm.dependencies = { walk, dtbox, askForPromise, query : { splitSegments, joinSegments, updateState } }
 
 
 
