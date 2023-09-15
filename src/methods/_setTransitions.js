@@ -1,14 +1,14 @@
 function _setTransitions () {
-return function ( table, lib ) {   // ( machineTable, transitionLib ) --> {transitions, nextState, chainActions}
+return function ( behavior, lib ) {   // ( machineTable, transitionLib ) --> {transitions, nextState, chainActions}
      // *** Converts initial FSM data to useful fsm objects.
                 let 
                        transitions = {}
                      , nextState = {}
                      , chainActions = {}
                      ;
-                table.forEach ( el => {
+                behavior.forEach ( line => {
                         const 
-                              [ from, action, next, transitionName, alt ] = el
+                              [ from, action, next, transitionName, alt ] = line
                             , transition = lib [ transitionName ]
                             , key = `${from}/${action}`
                             ;

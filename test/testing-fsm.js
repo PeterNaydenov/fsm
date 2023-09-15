@@ -19,7 +19,7 @@ describe ( 'Finite State Machine', () => {
                         }
                   , machine = {
                                  init  : 'none'
-                               , table : [
+                               , behavior : [
                                             // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                               [ 'none',   'activate', 'active', 'switchON'  ]
                                             , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -73,7 +73,7 @@ describe ( 'Finite State Machine', () => {
                             }
                       , machine = {
                                     init  : 'none'
-                                  , table : [
+                                  , behavior : [
                                                 // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                   [ 'none',   'activate', 'active', 'switchON'  ]
                                                 , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -97,15 +97,15 @@ describe ( 'Finite State Machine', () => {
         // *** Convert stateData to update-response
             const 
                   lib   = {
-                                switchON ({task,stateData}) {
-                                        const [ say ] = stateData.extractList (['say'],{ as: 'std'});
+                                switchON ({task,extractList}) {
+                                        const [ say ] = extractList (['say'],{ as: 'std'});
                                         task.done ({ success : true, response: { say } })
                                     }
                                 , switchOFF () {}
                         }
                 , machine = {
                                  init  : 'none'
-                               , table : [
+                               , behavior : [
                                             // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                               [ 'none',   'activate', 'active', 'switchON'  ]
                                             , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -141,7 +141,7 @@ describe ( 'Finite State Machine', () => {
                             }
                     , machine = {
                                      init  : 'none'
-                                   , table : [
+                                   , behavior : [
                                                 // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                   [ 'none',   'activate', 'active', 'switchON'  ]
                                                 , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -167,8 +167,8 @@ describe ( 'Finite State Machine', () => {
                 // *** Reset fsm state and stateData
                     const 
                           lib   = {
-                                        switchON ({task,stateData}) {
-                                                const [ test ] = stateData.extractList ([ 'test' ],{ as: 'std'});
+                                        switchON ({task,extractList}) {
+                                                const [ test ] = extractList ([ 'test' ]);
                                                 test.say =  'yo-ho-ho'
                                                 const name = 'John';
                                                 task.done ({ 
@@ -182,7 +182,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                         , machine = {
                                          init  : 'none'
-                                       , table : [
+                                       , behavior : [
                                                     // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -208,7 +208,7 @@ describe ( 'Finite State Machine', () => {
     
                     fsm.update ( 'activate' )
                          .then ( () => {
-                                const [r1, r2, q1] = fsm.extractList ( ['root', 'test', 'name' ], {as:'std'} );
+                                const [r1, r2, q1] = fsm.extractList ( ['root', 'test', 'name' ]);
 
                                 expect ( fsm.getState() ).to.be.equal ( 'active' )
                                 expect ( r1.name ).to.be.equal ( 'John')             // Requesting a 'root' will return object with all primitive state data fields
@@ -218,7 +218,7 @@ describe ( 'Finite State Machine', () => {
                                 
                                 fsm.reset ()   // Should change 'state' and 'stateData' to initial values
                                 expect ( fsm.getState()   ).to.be.equal ( machine.init )
-                                const [ r3, r4 ] = fsm.extractList (['root', 'test'], {as:'std'})
+                                const [ r3, r4 ] = fsm.extractList (['root', 'test'])
 
                                 expect ( r3.name ).to.be.equal ( 'Peter' )
                                 expect ( r4.say  ).to.be.equal ( 'hi' )
@@ -233,8 +233,8 @@ describe ( 'Finite State Machine', () => {
     it ( 'GetState', () => {
                     const 
                           lib   = {
-                                        switchON ( {task, dependencies, stateData, state} ) {
-                                                stateData.say = 'yo-ho-ho'
+                                        switchON ( {task, dependencies, state } ) {
+                                                let stateData = { say : 'yo-ho-ho'}
                                                 task.done ({ success  : true, stateData })
                                             }
                                         , switchOFF ( {task} ) {
@@ -243,7 +243,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                         , machine = {
                                          init  : 'none'
-                                       , table : [
+                                       , behavior : [
                                                     // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -273,7 +273,7 @@ describe ( 'Finite State Machine', () => {
                                             }
                                 }
                         , machine = {
-                                          table : [
+                                          behavior : [
                                                     // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -305,7 +305,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                         , machine = {
                                           init :  'none'
-                                        , table : [
+                                        , behavior : [
                                                     // [ fromState, action,  nextState, transition, chainActions(optional)  ]
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
@@ -340,7 +340,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                         , machine = {
                                           init :  'none'
-                                        , table : [
+                                        , behavior : [
                                                     // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
                                                       [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
                                                     , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
@@ -377,7 +377,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                         , machine = {
                                           init :  'none'
-                                        , table : [
+                                        , behavior : [
                                                     // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
                                                       [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
                                                     , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
@@ -413,7 +413,7 @@ describe ( 'Finite State Machine', () => {
                     const 
                           machine = {
                                       init :  'none'
-                                    , table : [
+                                    , behavior : [
                                                 // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
                                                   [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
                                                 , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'     ,                            ]
@@ -421,10 +421,10 @@ describe ( 'Finite State Machine', () => {
                                             ]
                               }
                           , lib = {
-                                        switchOn ( {task, dependencies, state, stateData}, data ) {
+                                        switchOn ( {task, dependencies, state, extractList}, data ) {
                                               task.done ({ success : false, response: 'switchON' })
                                             }
-                                      , altOn ( {task, dependencies, state, stateData}, data ) {
+                                      , altOn ( {task, dependencies, state, extractList}, data ) {
                                                 task.done ({ success : true, response: 'altON'})
                                             } 
                                   }
@@ -447,19 +447,19 @@ describe ( 'Finite State Machine', () => {
     it ( 'Multiple updates', done => {
                         const 
                               lib   = {
-                                            switchON ( {task, dependencies, state, stateData}, data ) {
+                                            switchON ( {task, dependencies, state, extractList}, data ) {
                                                     setTimeout ( () => task.done ({ success : true, response:data }), 220 )
                                                 }
                                             , altOn ( task ) {
                                                     task.done ({success: true})
                                                 }
-                                            , switchOFF ( {task, dependencies, state, stateData}, data ) {
+                                            , switchOFF ( {task, dependencies, state, extractList}, data ) {
                                                     setTimeout ( () => task.done ({ success: true, response: data }), 90 )
                                                 }
                                     }
                             , machine = {
                                               init :  'none'
-                                            , table : [
+                                            , behavior : [
                                                         // [ fromState, action,        nextState,          transition,        chainActions(optional)   ]
                                                           [ 'none'   , 'activate'     , 'active'            , 'switchON'  , [ false, 'useGenerator']   ]
                                                         , [ 'none'   , 'useGenerator' , 'alternativeSource' , 'altOn'                                  ]
@@ -493,7 +493,7 @@ describe ( 'Finite State Machine', () => {
                     const 
                         description = {
                                           init  : 'center'
-                                        , table : [ 
+                                        , behavior : [ 
                                                           [ 'center', 'goLeft', 'left', 'gotoLeft'    ]
                                                         , [ 'center', 'goRight', 'right', 'gotoRight' ]
                                                         , [ 'left'  , 'goRight', 'center', 'failure'  ]
@@ -508,13 +508,13 @@ describe ( 'Finite State Machine', () => {
                                                             }) 
                                                 }, 300)
                                             }
-                                , gotoRight ( {task, dependencies, stateData}, dt ) {
+                                , gotoRight ( {task, dependencies, extractList}, dt ) {
                                             task.done ({
                                                           success : true
                                                         , response  : 'Guten tag'
                                                 })
                                         }
-                                , failure ( {task, dependencies, stateData}, data ) {
+                                , failure ( {task, dependencies, extractList}, data ) {
                                             task.done ({
                                                               success : true
                                                             , response : data
@@ -572,7 +572,7 @@ describe ( 'Finite State Machine', () => {
                     const
                           description = {
                                                init : 'none'
-                                             , table : [
+                                             , behavior : [
                                                             [ 'none', 'start', 'initial', 'startUp' ]
                                                           , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                        ]
@@ -582,7 +582,7 @@ describe ( 'Finite State Machine', () => {
                                                         }
                                 }
                         , transitions = {
-                                            startUp ( {task, dependencies, stateData}, dt ) {
+                                            startUp ( {task, dependencies, extractList}, dt ) {
                                                         const 
                                                               duringStart = 'one'
                                                             , test = { name : 'Peter' }
@@ -593,7 +593,7 @@ describe ( 'Finite State Machine', () => {
                                                                     }
                                                         task.done ( response )
                                                 } // startup func.
-                                            , fireUp ( {task, dependencies, stateData}, dt ) {
+                                            , fireUp ( {task, dependencies, extractList}, dt ) {
                                                         const
                                                               duringFireUp = 'second'
                                                             , response = {
@@ -613,7 +613,7 @@ describe ( 'Finite State Machine', () => {
                                     const result = fsm.exportState ();
                                     const [ r1, r2, r3 ] = dtbox
                                                             .load ( result.stateData )
-                                                            .extractList (['duringStart', 'duringFireUp', 'test' ],{as:'std'}) 
+                                                            .extractList (['duringStart', 'duringFireUp', 'test' ], {as:'std'}) 
                                     expect ( r1 ).to.be.equal ( 'one' )
                                     expect ( r2 ).to.be.equal ( 'second' )
                                     expect ( result.state ).to.be.equal ( 'active' )
@@ -630,7 +630,7 @@ describe ( 'Finite State Machine', () => {
                     const
                             description = {
                                               init  : 'none'
-                                            , table : [
+                                            , behavior : [
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                         ]
@@ -643,7 +643,7 @@ describe ( 'Finite State Machine', () => {
                             })
                     
                     expect ( fsm.getState() ).to.be.equal ( 'imported' )
-                    const [ r1 ] = fsm.extractList ( ['in'], {as:'std'})
+                    const [ r1 ] = fsm.extractList ( ['in'])
                     expect ( r1 ).to.be.true
         }) // it Import externalState
 
@@ -653,9 +653,9 @@ describe ( 'Finite State Machine', () => {
 
     it ( 'Ignore Cached Updates', done => {
                     const
-                              description = {
+                              machine = {
                                               init  : 'none'
-                                            , table : [
+                                            , behavior : [
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                         ]
@@ -683,8 +683,7 @@ describe ( 'Finite State Machine', () => {
                                 }
                             ;
                     let result;
-                    const fsm = new Fsm ( description, transitions );
-
+                    const fsm = new Fsm ( machine, transitions );
                     /**
                      *   Execution order of fsm commands:
                      *      1. Update 'start';
@@ -702,7 +701,7 @@ describe ( 'Finite State Machine', () => {
                                   }
                               , x => {   //---> ignoreCachedUpdates should move logic here. X will contain error message produced by fsm.
                                           result = fsm.exportState ()
-                                          const [ r1, r2 ] = fsm.extractList (['yo', 'wrong'],{as:'std'})
+                                          const [ r1, r2 ] = fsm.extractList (['yo', 'wrong'])
                                           expect ( result.state ).to.be.equal ( 'initial' )
                                           expect ( r1 ).to.be.equal ( 'hello' )
                                           expect ( r2 ).to.be.false

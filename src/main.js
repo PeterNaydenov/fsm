@@ -13,7 +13,7 @@ const
   ;
 
 
-function Fsm ({init, table, stateData={}, debug }, lib={} ) {
+function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib={} ) {
             const 
                   fsm   = this
                 , api = {}
@@ -21,6 +21,7 @@ function Fsm ({init, table, stateData={}, debug }, lib={} ) {
                 
             fsm.state            = init || MISSING_STATE
             fsm.initialState     = init || MISSING_STATE
+            fsm.stateDataFormat  = stateDataFormat
             fsm.lock             = false   // switch 'ON' during transition in progress. Write other updates in cache.
             fsm.cache            = []      // cached 'update' actions
 
@@ -46,7 +47,7 @@ function Fsm ({init, table, stateData={}, debug }, lib={} ) {
             fsm.stateData        = dtbox.init ( stateData ).query ( splitSegments )
             fsm.initialStateData = dtbox.init ( stateData ).query ( splitSegments )
 
-            const {transitions, nextState, chainActions } = fsm._setTransitions ( table, lib );
+            const {transitions, nextState, chainActions } = fsm._setTransitions ( behavior, lib );
             if ( debug ) {  
                         fsm._warn ( transitions )
                         global.debugFSM = fsm

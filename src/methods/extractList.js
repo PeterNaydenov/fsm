@@ -8,7 +8,9 @@ function extractList ( fsm ) {
  *  @returns {array.<[object,dt-object,string,number,null]>}  - The list of requested segments.
  */
 return function extractList ( requestedSegments, options=false ) {
-            return fsm.stateData.extractList ( requestedSegments, options )
+            let format = fsm.stateDataFormat;
+            if ( !options )   return fsm.stateData.extractList ( requestedSegments, {as:format} )
+            else              return fsm.stateData.extractList ( requestedSegments, options )
 }} // extractList func.
 
 

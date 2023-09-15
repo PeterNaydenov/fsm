@@ -6,11 +6,30 @@
 - [x] Transition functions have different arrangment of arguments;
 - [x] Transition functions can receive multiple data arguments(single is still the preference);
 - [x] Transition functions can update only defined stateData fields. Not defined data-segments or properties will be ignored;
-- [x] Method `exportState` will return an object with two properties: `state` and `stateData`. `state` is a string. `stateData` is a DT-model. Method `importState` expect exact same object as argument;
-- [x] Result.command was removed permanently from the code;
+- [x] Method `exportState` returns an object with two properties: `state` and `stateData`. `state` is a string. `stateData` is a DT-model. Method `importState` expect exact same object as argument;
+- [x] Transion result.command was removed permanently from the code;
 - [x] New method: `extractList` returns a list of requested stateData properties;
 - [x] Internal fsm data is hidden. Only public methods are available;
+- [x] Changes in stateData can be provided as standard javascript object, DT-model or dt-object. Automatic detection is implemented;
+- [x] Machine description 'table' was renamed to 'behavior';
 - [x] TODO: Here are new methods that I should look  '_updateStateData', extractList;
+
+## TODO:
+- Default extraction model for stateData ;
+- FSM-hub should be alligned with the new version;
+- method: explore: 
+      -> list -> returns list of what is provided as second argument[ 'states', 'actions', 'state/action' ] 
+      -> states: List of available states 
+      -> transitions: Returns a function name for state/action name. If is not provided will return full list of possible action/ transition function
+      -> actions: List of available actions from provided state. If is not provided will return full list of possible actions from current state;
+
+
+      -> provide table of state/action -> transition -> resultState [ chainPositive, chainNegative] 
+      -> ask for specific state -> provide list of possible actions;
+      -> ask for specific action -> provide list of possible states;
+- Do I have multiple transition functions?
+
+
 
 
 

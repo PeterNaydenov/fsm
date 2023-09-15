@@ -160,17 +160,19 @@ Only one of the params in this object is required:
 
 ```js
    setDependencies     : 'Insert all external dependencies'
- , getState            : 'Returns actual state'
+ , getDependencies     : 'Returns all external dependencies'
  , update              : 'Trigger an action'
- , exportState         : 'Export state and stateData as a single object (externalState)'
  , importState         : 'Import externalState object.'
+ , exportState         : 'Export state and stateData as a single object (externalState)'
  , reset               : 'Revert state and stateData to initial values described during initialization'
  , ignoreCachedUpdates : 'Ignore all cached updates'
+ , getState            : 'Returns actual state'
+ , extractList         : 'Extract list of state segments or properties'
 ```
 
 
 ### fsm.setDependencies ()
-Set dependencies for FSM. Dependency object will be provided to every transition function. With **dependency injection** code will stay testable. Don't forget to add here all **window** based objects and functions that are available only in the browser environment.
+Set dependencies for FSM. Dependency object will be provided to every transition function. With **dependency injection** code will stay testable. Method could be called multiple times. All dependencies will be merged in one object.
 
 ```js
  const 
@@ -184,7 +186,44 @@ Set dependencies for FSM. Dependency object will be provided to every transition
 
   fsm.setDependencies ( deps )     
 ```
+- deps: object. Object with external dependencies;
 - **Method returns**: void;
+
+
+
+### fsm.getDependencies ()
+Returns all external dependencies.
+
+```js
+ const 
+      moment = require ( 'moment' )
+    , fsm = new Fsm ()
+    , deps = {
+              scrollTo : window.scrollTo
+            , moment 
+        }
+    ;
+
+  fsm.setDependencies ( deps )     
+  const allDeps = fsm.getDependencies ()     
+```
+
+
+
+### fsm.update ()
+Provide actions to FSM. If conditions 'state/action' exist in description table, FSM will react.
+- If action name does not exist in description table, FSM will ignore the action;
+- If transition function is not provided, FSM will ignore the action;
+
+```js
+ fsm.update ( action, altData )
+    .then ( r => {
+             // ...do something with the response
+        })
+```
+- **action**(required): string. The action name.
+- **altData**(optional): any. Additional data provided to the transition;
+- **Method returns**: Promise<any>. Returned value is equal to transitionResult.response;
 
 
 
@@ -198,17 +237,6 @@ Will return current current FSM state.
 
 
 
-### fsm.update ()
-Provide actions to FSM. If conditions 'state/action' exist in description table, FSM will react.
-```js
- fsm.update ( action, altData)
-    .then ( r => {
-             // ...do something with the response
-        })
-```
-- **action**(required): string. The action.
-- **altData**(optional): any. Additional data provided to the transition;
-- **Method returns**: Promise of any. Returned value is equal to transitionResult.response;
 
 
 
