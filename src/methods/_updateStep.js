@@ -21,7 +21,7 @@ return function ( updateTask, action, data ) {
                      */
 
                     let 
-                          chainActions = fsm._getChain ( fsm.chainActions, key)
+                          chainActions = fsm._getChain ( key )
                         , data = result.response
                         ;
                     if ( result.success ) {

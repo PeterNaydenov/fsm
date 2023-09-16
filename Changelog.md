@@ -27,7 +27,7 @@
       -> provide table of state/action -> transition -> resultState [ chainPositive, chainNegative] 
       -> ask for specific state -> provide list of possible actions;
       -> ask for specific action -> provide list of possible states;
-- Do I have multiple transition functions?
+- Do I have multiple transition functions? - no! Callbacks are part of debuging event system;
 
 
 

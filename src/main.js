@@ -13,7 +13,7 @@ const
   ;
 
 
-function Fsm ({init, behavior, stateData={}, debug, stateDataFormat='std' }, lib={} ) {
+function Fsm ({init, behavior, stateData={}, debug, stateDataFormat={as:'std'} }, lib={} ) {
             const 
                   fsm = this
                 , api = {}

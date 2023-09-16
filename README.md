@@ -5,24 +5,39 @@
 
 
 
-Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. An FSM is defined by a list of its states, its initial state, and the conditions for each transition.
+Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. 
+An FSM definition includes:
+
+
 ```js
-const myFsm = {
+const fsmDefinition = {
           init  : 'none'  // initial fsm state
-        , table : [     
-                    // [ fromState,  action   , nextState, transitionFx ]
+        , behavior : [     
+                    // [ fromState,  action   , nextState, transitionFx, chaining ]
                        [ 'none'   , 'activate', 'active' , 'switchON'   ] // transition condition
                     ,  [ 'active' , 'stop'    , 'none'   , 'switchOFF'  ] // transition condition
                  ]
+        , stateData : { 
+                        // ... all stateData flags are here
+                      }
+                    }
     }
 ```
-- **init**: string. Initial state for the FSM;
-- **table**: array of transitionConditions. Describe relation among fsm state, action and transition;
+- **init**: string. Initial state of the FSM;
+- **stateData**: Container for all stateData required by the FSM. 
+- **behavior**: array of transition conditions. Describe relation among fsm state, action and transition;
 - **transitionCondition**: Array [fromState action nextState transitionFx];
 - **fromState**: string. State as starting point for transition;
 - **action**: string. External input signal. Transition could happen only when fromState and action are described in transitionCondition record;
-- **nextState**: string. The FSM state if transition is successful;
+- **nextState**: string. The next FSM state if transition become successful;
 - **transitionFx**: string. The function name that will be executed on 'state/action' conditions. Transition should return **transitionResult** object where parameter "**success**" will represent transition success. Result of transition will be evaluated by FSM. Positive response will change actual state to 'nextState' from transitionCondition record. Negative result will keep actual state;
+- **chaining**(optional): Array [ positive, negative ]. Optional element of `transition condition`. It's a mechanism to trigger next action based on the result of the transition. If transition result is positive, FSM will trigger action from `positive` position. If transition result is negative, FSM will trigger action from `negative` position. If only one position will use chaining, set the other as 'false'.
+```js
+    // ... transition conditions
+    , [ 'ready', 'activate', 'active', 'switchOFF', [ false, 'generator' ] ]
+    // Chaining will trigger 'generator' action on negative transition result and will do nothing on positive result.
+    // ... transition conditions
+```
 
 **Transitions** are functions and they are provided to FSM as functional library - javascript object with functions.
 ```js
@@ -150,7 +165,6 @@ Only one of the params in this object is required:
       success : true   // Required. Boolean. Transition success;
     , response : {}    // Optional. Object. update answer response;
     , stateData : {}   // Optional. Object. 'stateData' if there is stateData changes; 
-    , command : null   // Optional. String|null|undefined. Next action if chaining is required (depricated). Use "chainActions" in table instead;
    }
  ```
 

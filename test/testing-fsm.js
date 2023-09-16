@@ -98,7 +98,7 @@ describe ( 'Finite State Machine', () => {
             const 
                   lib   = {
                                 switchON ({task,extractList}) {
-                                        const [ say ] = extractList (['say'],{ as: 'std'});
+                                        const [ say ] = extractList (['say']);
                                         task.done ({ success : true, response: { say } })
                                     }
                                 , switchOFF () {}
