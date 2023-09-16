@@ -52,13 +52,13 @@ const transitionLibrary = {
 ```
 
 It's simple and clean way to represent system behaviour but practice shows that is not enough. This implementation was extended to cover some aditional program needs like:
-- Transition function could contain asynchronous code(Available after version 2.0); 
-- Chain-actions in **transaction conditions** (Optional after version 2.0);
-- Chain-actions are possible on **positive** and *negative* transition-end (After version 2.0);
-- Export fsm state as an object: externalState. (Available after version 2.1);
-- Import externalState (Available after version 2.1);
-- Prevent simultaneous updates (Available after version 2.1);
-- Cache stack for fsm-updates and postponed execution (Available after version 2.1);
+- Transition function could contain asynchronous code; 
+- Chain-actions in **transaction conditions**(Optional);
+- Chain-actions are possible on **positive** and *negative* transition-end;
+- Export fsm state as an object: externalState;
+- Import externalState;
+- Prevent simultaneous updates;
+- Fsm-updates cache mechanism and execution in a row;
 
 
 
@@ -85,24 +85,24 @@ If your project is commonJS, use a dynamic `import` function or use version v.3.
 
 
 ## Fsm Description
-Fsm description is an object that define fsm business logic. Every fsm description should contain **init** and **table** properties.:
+Fsm description is an object that define fsm business logic. Every fsm description should contain **init** and **behavior** and **stateData** properties.:
 ```js
 const machine = {
         init : 'stopped'
-      , table: [
+      , behavior: [
                 //    [  state   , action    , nextState, functionName, chainAction(optional) ]
                       [ 'stopped', 'activate', 'active', 'fnActivate' ]
                     , [ 'stopped', 'activate', 'active', 'fnActivate' ]
                 ]
       , stateData : { greeting: 'hi' }
-      /** Parameter 'stateData' is optional parameter. Data will be 
-       *  provided to each transition function. You can read and modify
-       *  stateData values.
+      /** Parameter 'stateData' is required parameter. It's a data storage space.
+       *  Storaged data is available in every transition function by using a function 'extractList'. 
+       *  Only a predefined state-data-names can be saved in 'stateData'
        * /
       }
 ```
 
-Property '**init**' is the initial state of the system. Property '**table**' describes how system reacts. Every row contain 5 elements:
+Property '**init**' is the initial state of the system. Property '**behavior**' describes how system reacts. Every row contain 5 elements:
  1. Current active state;
  2. Action;
  3. Next state;
@@ -113,7 +113,7 @@ Property '**init**' is the initial state of the system. Property '**table**' des
  [ 'stopped', 'activate', 'active', 'fnActivate' ]
  // Read this transition condition like:
  /**
-  *  When state is 'stopped' and external input 'activate' comes, transition 'fnActivate' will be executed. On success state will become 'active'. No chain-actions are defined.
+  *  When state is 'stopped' and action 'activate' comes, transition 'fnActivate' will be executed. On success state will become 'active'. No chain-actions are defined.
   */
  ```
 
@@ -137,19 +137,20 @@ Object that will contain all transition functions:
 
  ## Fsm Transition Function
 
- Fsm transition function is a function, member of transition library. Transition functions is kind of middleware. Every function receives 4 arguments:
+ Fsm transition function is a function, member of transition library. Transition functions is kind of middleware. Every function receives this arguments:
  ```js
 const lib = {
-  fnActivate ( task, dependencies, stateObject, dt ) {
+  fnActivate ( {task, state, dependencies, extractList}, data ) {
        // function code is here...
        task.done ( end )   // end is a transitionResult {}
     }
 }
  ```
  - task         - askForPromise object; [AskForPromise documentation](https://github.com/PeterNaydenov/ask-for-promise). Represents asynchronous transition execution. Finish by providing to task object, the transition result object. `task.done( transitionResult )`;
+ - state        - string. Current state of the FSM;
  - dependencies - object. Contain all external dependencies. Set fsm dependencies by fsm.setDependencies(); 
- - stateObject  - object. Contains all helper params needed to support the FSM state;
- - dt           - object. External data provided from fsm.update( action, **dt**);
+ - extractList  - function. Extract data from FSM stateData;
+ - data         - any(Prefered: object). External data provided from fsm.update( action, **data**);
 
 Execution of transition function will end on `task.done(end)` where **end** is an **transitionResult** object. 
 
@@ -226,7 +227,8 @@ Returns all external dependencies.
 
 ### fsm.update ()
 Provide actions to FSM. If conditions 'state/action' exist in description table, FSM will react.
-- If action name does not exist in description table, FSM will ignore the action;
+- If action name does not exist in behavior table, FSM will ignore the action;
+- If action name exist in behavior table but current state is different, FSM will ignore the action;
 - If transition function is not provided, FSM will ignore the action;
 
 ```js
@@ -379,7 +381,9 @@ fsm.update ( 'activate' )
 
 
 
+## External Links
 
+- [Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine)
 
 
 
