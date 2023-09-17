@@ -1,8 +1,9 @@
+'use strict'
 function reset ( fsm ) {
 return function () {
+    const { dtbox } = fsm.dependencies;
     fsm.state = fsm.initialState
-    fsm.stateData = {}
-    Object.entries ( fsm.initialStateData ).forEach ( ([key,value]) => fsm.stateData[key] = value )
+    fsm.stateData = dtbox.load ( fsm.initialStateData.export() ) 
 }} // reset func.
 
 

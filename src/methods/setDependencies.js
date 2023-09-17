@@ -1,5 +1,5 @@
 function setDependencies ( fsm ) {
-return function ( deps ) {
+return function setDependencies ( deps ) {
     fsm.dependencies = { ...fsm.dependencies, ...deps }
 }} // setDependencies func.
 

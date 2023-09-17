@@ -1,12 +1,14 @@
 function _updateStep ( fsm ) {
-return function ( updateTask, action, dt ) {
+return function ( updateTask, action, data ) {
     const 
-          task = fsm.askForPromise ()
+          { askForPromise } = fsm.dependencies
+        , task = askForPromise ()
         , key  = `${fsm.state}/${action}`
-        , cb   = fsm.callback
+        , cb   = fsm.callback   // Event-based callbacks
         ;
+
     fsm.lock = true
-    fsm._transit ( task, key, dt )
+    fsm._transit ( task, key, data )
     task.onComplete (
             result => {
                     /**
@@ -15,18 +17,17 @@ return function ( updateTask, action, dt ) {
                      *       success   - boolean. Is it transition successful.
                      *     ? stateData - object. Flat object with fsm state values.
                      *     ? response  - object. External data as response of transition if needed.
-                     *     ? command   - string. Next action if function-chaining. (depricated!) Use a chainAction inside the logic table
                      *  }
                      */
-                    
+
                     let 
-                          chainActions = fsm._getChain ( fsm.chainActions, key)
+                          chainActions = fsm._getChain ( key )
                         , data = result.response
                         ;
-                
                     if ( result.success ) {
                             fsm.state = fsm.nextState [ key ]
-                            if ( result.stateData )   fsm.stateData = result.stateData
+                            if ( result.stateData != null   )   fsm.stateData = fsm._updateStateData ( result.stateData ) 
+                        
                             cb [ 'positive'   ].forEach ( fn => fn ( fsm.state, data)   )
                             cb [ 'transition' ].forEach ( fn => fn ( fsm.state, data)   )
                             if ( chainActions && chainActions[0] ) {
@@ -42,10 +43,6 @@ return function ( updateTask, action, dt ) {
                                     return
                                }
                          }
-                    if ( result.command ) {
-                               fsm._updateStep ( updateTask, result.command, data )
-                               return
-                          }
                     updateTask.done ( data )
             }) // task onComplete
 

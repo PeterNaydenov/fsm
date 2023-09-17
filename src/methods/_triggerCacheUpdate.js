@@ -1,3 +1,5 @@
+'use strict'
+
 function _triggerCacheUpdate ( fsm ) {
 return function () {
         if ( fsm.cache.length !== 0 ) {
