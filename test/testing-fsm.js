@@ -710,6 +710,158 @@ describe ( 'Finite State Machine', () => {
                                   })
                }) // it Ignore cached updates
 
+
+
+
+
+      it ( 'extractList', done => {
+                    const
+                              machine = {
+                                              init  : 'none'
+                                            , behavior : [
+                                                              [ 'none', 'start', 'initial', 'startUp' ]
+                                                            , [ 'initial', 'move', 'active', 'fireUp'  ]
+                                                        ]
+                                            , stateData : { 
+                                                            yo: 'hi'
+                                                          , wrong: false
+                                                          , deep : { prop: 12, prop2: 'hi' }
+                                                          }
+                                }
+                            , transitions = {
+                                       startUp ({ task, extractList }) {
+                                            const stateDataExtraction = extractList ();
+                                            expect ( stateDataExtraction ).to.be.deep.equal ( machine.stateData )
+                                            // Use setTimeout to keep task unresolved for a while.
+                                            setTimeout ( () => {
+                                                    task.done ({ 
+                                                                  success   : true 
+                                                                , stateData : { yo:'hello' }
+                                                            })
+                                                }, 200 )
+                                          } // startUp func.
+                                    , fireUp ({ task }) {
+                                                task.done ({ 
+                                                              success : true
+                                                            , stateData :  { 'wrong' : true }
+                                                        })
+                                          } // fireUp func.
+                                }
+                            ;
+
+                    const fsm = new Fsm ( machine, transitions );
+                    fsm.update ( 'start' )
+                       .then ( x => {                                
+                                expect ( x ).to.be.undefined
+                                let stData = fsm.extractList (); // extractList without arguments returns all stateData as a single object.
+                                expect ( stData.yo ).to.be.equal ( 'hello' )
+                                expect ( stData.wrong ).to.be.false
+                                expect ( stData.deep.prop ).to.be.equal ( 12 )
+                                expect ( stData.deep.prop2 ).to.be.equal ( 'hi' )
+                                done ()
+                            })
+              }) // it extractList
+
+
+
+
+
+      it ( 'Change stateData as dt-model and dt-object', done => {
+                        const
+                              machine = {
+                                              init  : 'none'
+                                            , behavior : [
+                                                              [ 'none', 'start', 'initial', 'startUp' ]
+                                                            , [ 'initial', 'move', 'active', 'fireUp'  ]
+                                                        ]
+                                            , stateData : { 
+                                                            yo: 'hi'
+                                                          , wrong: false
+                                                          , deep : { prop: 12, prop2: 'hi' }
+                                                          }
+                                }
+                            , transitions = {
+                                       startUp ({ task, dependencies }) {
+                                            // Use setTimeout to keep task unresolved for a while.
+                                            const { dtbox } = dependencies;
+                                            setTimeout ( () => {
+                                                            const deep = { 
+                                                                            prop: 'aloha'
+                                                                          , prop2: ['startUpdate', 'something', 'more'] 
+                                                                    };
+                                                            task.done ({ 
+                                                                          success   : true 
+                                                                        , stateData : dtbox.init({ deep, yo:'hello' }).export() // Checkout dt-model input
+                                                                        , response : { 'started': true }
+                                                                    })
+                                                    }, 200 )
+                                          } // startUp func.
+                                    , fireUp ({ task, dependencies }) {
+                                                const { dtbox } = dependencies;                                      
+                                                task.done ({ 
+                                                              success : true
+                                                            , stateData : dtbox.init ({ 'wrong' : true }) // Checkout dt-object input
+                                                        })
+                                          } // fireUp func.
+                                }
+                            ;
+
+                      const fsm = new Fsm ( machine, transitions );
+                      fsm.update ( 'start' )
+                         .then ( x => {
+                                    expect ( x ).to.be.deep.equal ( { started: true } )
+                                    let startChanges = fsm.extractList ();
+
+                                    expect ( startChanges.yo ).to.be.equal ( 'hello' )
+                                    expect ( startChanges.wrong ).to.be.false
+                                    expect ( startChanges.deep.prop ).to.be.equal ( 'aloha' )
+                                    expect ( startChanges.deep.prop2 ).to.be.deep.equal ( ['startUpdate', 'something', 'more'] )
+                                    expect ( fsm.getState() ).to.be.equal ( 'initial' )
+                                    return fsm.update ( 'move' )
+                              })
+                        .then ( x => {
+                                    const moveChanges = fsm.extractList ();
+                                    expect ( moveChanges.yo ).to.be.equal ( 'hello' )
+                                    expect ( moveChanges.wrong ).to.be.true
+                                    expect ( moveChanges.deep.prop ).to.be.equal ( 'aloha' )
+                                    expect ( moveChanges.deep.prop2 ).to.be.deep.equal ( ['startUpdate', 'something', 'more'] )
+                                    done ()
+                              })
+
+              }) // it Change stateData as dt-model and dt-object
+
+
+
+
+
+      it ( 'ExtractList with options', done => {  
+                      const machine = {
+                                              init  : 'none'
+                                            , behavior : [
+                                                              [ 'none', 'start', 'initial', 'startUp' ]
+                                                        ]
+                                            , stateData : { 
+                                                            yo: 'hi'
+                                                          , wrong: false
+                                                          , deep : { prop: 12, prop2: 'hi', inside: { well: true } }
+                                                          }
+                                      }
+                            , transitions = {
+                                       startUp ({ task, extractList }) {
+                                                // Use setTimeout to keep task unresolved for a while.
+                                                const [ working, deepObject, say ] = extractList([ 'wrong', 'deep', 'yo'], {as: 'tuples'});
+                                                expect ( working ).to.be.false   // Primitive values are extracted directly
+                                                expect ( deepObject ).to.be.deep.equal ( [ [ 'prop', 12 ], [ 'prop2', 'hi' ], ['inside/well', true ] ] )   // ExtractList options are used 
+                                                expect ( say ).to.be.equal ( 'hi' ) 
+                                                task.done ({ success   : true })
+                                                done ()
+                                          } // startUp func.
+                                }
+                            ;
+                      const fsm = new Fsm ( machine, transitions );
+                      fsm.update ( 'start' )
+          }) // it ExtractList as dt-object
+
 }) // describe
 
 

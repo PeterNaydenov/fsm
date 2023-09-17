@@ -7,13 +7,14 @@ function _updateStateData ( fsm ) {
  * @returns {dt-object}         - The updated state data.
  */
 return function _updateStateData ( updateObject ) {
+    
         const { dtbox, query } = fsm.dependencies;
         // Recognize the updateObject type: dt-object, dt-model or javascript object;
         let updateType = 'javascriptObject';
         if ( updateObject.export )   updateType = 'dt-object'
         if ( 
                 updateObject instanceof Array &&
-                updateObject[0] === updateObject[3] &&
+                updateObject[0][0] === updateObject[0][2] &&
                 updateObject.every ( line => line.length === 4)
             ) {
                     updateType = 'dt-model' 
@@ -31,6 +32,7 @@ return function _updateStateData ( updateObject ) {
         if ( ['javascriptObject','dt-model'].includes(updateType)             )   updateObject = dtbox.load ( updateObject )
         if ( ['javascriptObject','dt-model','dt-object'].includes(updateType) )   updateObject = updateObject.query ( query.splitSegments )
         // Update the state data
+    
         return fsm.stateData.query ( query.updateState, updateObject )
 }} // _updateStateData func.
 

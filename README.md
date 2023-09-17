@@ -3,8 +3,12 @@
 ![version](https://img.shields.io/github/package-json/v/peterNaydenov/fsm)
 ![license](https://img.shields.io/github/license/peterNaydenov/fsm)
 
+## What's new in version 5.x.x
+- For fast upgrade, checkout the [Migration Guide](https://github.com/PeterNaydenov/fsm/blob/master/Migration.guide.md)
+- List of [all changes are available in Changelog file](https://github.com/PeterNaydenov/fsm/blob/master/Changelog.md)
+- Documentation is updated to reflect the changes in version 5.x.x;
 
-
+## Description
 Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. 
 An FSM definition includes:
 
@@ -85,24 +89,24 @@ If your project is commonJS, use a dynamic `import` function or use version v.3.
 
 
 ## Fsm Description
-Fsm description is an object that define fsm business logic. Every fsm description should contain **init** and **behavior** and **stateData** properties.:
+Fsm description is an object that define fsm business logic. Every fsm description should contain **init** and **behavior** properties.:
 ```js
 const machine = {
         init : 'stopped'
       , behavior: [
                 //    [  state   , action    , nextState, functionName, chainAction(optional) ]
-                      [ 'stopped', 'activate', 'active', 'fnActivate' ]
-                    , [ 'stopped', 'activate', 'active', 'fnActivate' ]
+                      [ 'stopped', 'activate', 'active', 'fnActivate' ] // transition condition
+                    , [ 'active' , 'stop'    , 'stoped', 'fnStop'     ] 
                 ]
       , stateData : { greeting: 'hi' }
-      /** Parameter 'stateData' is required parameter. It's a data storage space.
+      /** Parameter 'stateData' is not a required parameter. It's a data storage space.
        *  Storaged data is available in every transition function by using a function 'extractList'. 
        *  Only a predefined state-data-names can be saved in 'stateData'
        * /
       }
 ```
 
-Property '**init**' is the initial state of the system. Property '**behavior**' describes how system reacts. Every row contain 5 elements:
+Property '**init**' is the initial state of the system. Property '**behavior**' describes how system reacts. Every row(transition condition) contains 5 elements:
  1. Current active state;
  2. Action;
  3. Next state;
@@ -360,13 +364,14 @@ const
             }
     , machine = {
                       init  :  'none'
-                    , table : [
+                    , behavior : [
                                 [ 'none'   , 'start'      , 'active' , 'switchON', [ false, 'generator']  ]
                               , [ 'none'   , 'generator'  , 'altSrc' , 'altOn'         ]
                               , [ 'active' , 'stop'       , 'none'   , 'switchOFF'     ]
                               , [ 'altSrc' , 'stop'       , 'none'   , 'switchOFF'     ]
                               , [ 'altSrc' , 'electricity' , 'active', 'primarySource' ]
                             ]
+                    , stateData : {}
                 }
     ;
 const fsm = new Fsm ( machine, lib );
@@ -383,8 +388,8 @@ fsm.update ( 'activate' )
 
 ## External Links
 
-- [Finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine)
-
+- [Fsm version 4.x.x - previous version](https://github.com/PeterNaydenov/fsm/tree/4.x.x)
+- [AskForPromise - a promise library](https://github.com/PeterNaydenov/ask-for-promise)
 
 
 
