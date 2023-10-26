@@ -1,6 +1,11 @@
 ## Release History
 
 
+### 5.1.1 ( 2023-10-26)
+- [x] Dependencies update: ask-for-promise@1.4.0;
+- [x] Dependencies update: dt-toolbox@7.3.0;
+
+
 
 ### 5.0.0 ( 2023-09-16 )
 - [x] Machine description `table` was renamed to `behavior`;
