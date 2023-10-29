@@ -1,5 +1,8 @@
 ## Release History
 
+### 5.1.2 ( 2023-10-29)
+- [x] Dependencies update: @peter.naydenov/dt-queries@1.0.3;
+
 
 ### 5.1.1 ( 2023-10-26)
 - [x] Dependencies update: ask-for-promise@1.4.0;
