@@ -1,6 +1,6 @@
 {
   "name": "@peter.naydenov/fsm",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Simple Finite State Machine",
   "main": "src/main.js",
   "type": "module",
