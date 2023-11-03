@@ -13,7 +13,7 @@
   "dependencies": {
     "@peter.naydenov/dt-queries": "^1.0.3",
     "ask-for-promise": "1.5.0",
-    "dt-toolbox": "^7.3.0"
+    "dt-toolbox": "^7.4.0"
   },
   "devDependencies": {
     "c8": "^8.0.1",
