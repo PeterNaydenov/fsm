@@ -1,7 +1,22 @@
 ## Release History
 
+
+
+### 5.2.0 ( 2024-02-04)
+- [x] Dependencies update: @peter.naydenov/dt-queries@1.1.0;
+- [x] Dependencies update: dt-toolbox@7.4.2;
+- [x] Dependencies update: ask-for-promise@2.0.3;
+- [x]  Folder 'dist' was added to the project. Includes commonjs, umd and esm versions of the library;
+- [x] Package.json: "exports" section was added. Allows you to use package as commonjs or es6 module without additional configuration;
+- [x] Rollup was added to the project. Used to build the library versions;
+- [x] Dev dependencies update. Chai@5.0.3;
+- [x] Dev dependencies update. C8@9.1.0;
+
+
+
 ### 5.1.2 ( 2023-10-29)
 - [x] Dependencies update: @peter.naydenov/dt-queries@1.0.3;
+
 
 
 ### 5.1.1 ( 2023-10-26)
