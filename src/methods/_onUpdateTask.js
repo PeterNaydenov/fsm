@@ -5,10 +5,10 @@ return function _onUpdateTask ( data ) {
         ,  updateCallbacks = fsm.dependencies.askForPromise ( cb['update'] )
         ;
 
-    cb [ 'update' ].forEach ( (fn,i) => {
+    updateCallbacks.each ( ({value:fn, done }) => {
                     fn ( fsm.state, data )
-                    updateCallbacks[i].done ()
-            })
+                    done ()
+                })
 
     updateCallbacks.onComplete ( x => {
                     fsm.lock = false

@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@peter.naydenov/dt-queries": "^1.1.1",
-    "ask-for-promise": "2.0.3",
+    "ask-for-promise": "3.0.1",
     "dt-toolbox": "^7.4.3"
   },
   "devDependencies": {
