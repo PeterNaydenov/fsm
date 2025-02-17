@@ -2,7 +2,7 @@
 
 
 
-### 5.2.1 ( 2025-02-17)
+### 5.2.3 ( 2025-02-17)
 - [x] Dependencies update: @peter.naydenov/dt-toolbox@7.4.4;
 
 
