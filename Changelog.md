@@ -2,6 +2,11 @@
 
 
 
+### 5.2.1 ( 2025-02-17)
+- [x] Dependencies update: @peter.naydenov/dt-toolbox@7.4.4;
+
+
+
 ### 5.2.0 ( 2024-02-04)
 - [x] Dependencies update: @peter.naydenov/dt-queries@1.1.0;
 - [x] Dependencies update: dt-toolbox@7.4.2;
