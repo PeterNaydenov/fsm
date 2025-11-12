@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@peter.naydenov/dt-queries": "^1.1.1",
-    "ask-for-promise": "3.0.1",
-    "dt-toolbox": "^7.4.4"
+    "ask-for-promise": "3.1.0",
+    "dt-toolbox": "^7.4.5"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
