@@ -1,7 +1,7 @@
 {
   "name": "@peter.naydenov/fsm",
   "description": "Finite State Machine",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "license": "MIT",
   "author": "Peter Naydenov",
   "main": "./dist/fsm.umd.js",
