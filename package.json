@@ -39,8 +39,6 @@
     "type": "git",
     "url": "https://github.com/PeterNaydenov/fsm.git"
   },
-"overrides": { "glob": "^11.1.0" },
-"resolutions": { "glob": "^11.1.0" },
   "c8": {
     "include": [
       "src/**/*.js"
