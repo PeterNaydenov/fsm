@@ -2,6 +2,11 @@
 
 
 
+### 5.2.5 ( 2026-05-11)
+- [x] Dependency update: Ask-for-promise@3.1.1;
+
+
+
 ### 5.2.4 ( 2025-11-12)
 - [x] Dependencies update: @peter.naydenov/dt-toolbox@7.4.5;
 - [x] Dependencies update: ask-for-promise@3.1.0;
