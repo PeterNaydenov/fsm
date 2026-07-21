@@ -24,7 +24,7 @@
   "dependencies": {
     "@peter.naydenov/dt-queries": "^1.1.1",
     "ask-for-promise": "^3.2.0",
-    "dt-toolbox": "^7.4.5"
+    "dt-toolbox": "^7.4.8"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.3",
