@@ -1,6 +1,11 @@
 ## Release History
 
 
+### 5.2.6 ( 2026-07-21)
+- [x] Dependency update: ask-for-promise@3.2.0;
+- [x] Dependency update: dt-toolbox@7.4.8;
+- [x] Dependency update: @peter.naydenov/dt-queries@1.1.4;
+
 
 ### 5.2.5 ( 2026-05-11)
 - [x] Dependency update: Ask-for-promise@3.1.1;
