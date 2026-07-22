@@ -11,7 +11,12 @@ return function _updateStateData ( updateObject ) {
         const { dtbox, query } = fsm.dependencies;
         // Recognize the updateObject type: dt-object, dt-model or javascript object;
         let updateType = 'javascriptObject';
-        if ( updateObject.export )   updateType = 'dt-object'
+        // dt-objects expose `updateObject.export()` as a function. A plain
+        // object that happens to have a truthy `export` property (a string,
+        // a number, an object…) must NOT be misdetected as a dt-object —
+        // otherwise the dtbox.load step below would call `.query()` on it
+        // and crash. Hence `typeof === 'function'`, not a truthiness check.
+        if ( typeof updateObject.export === 'function' )   updateType = 'dt-object'
         if ( 
                 updateObject instanceof Array &&
                 updateObject[0][0] === updateObject[0][2] &&

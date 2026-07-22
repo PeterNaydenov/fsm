@@ -29,12 +29,13 @@ return function ( behavior, lib ) {   // ( machineTable, transitionLib ) --> {tr
 
 function _isAltValid ( alt ) {   //   (altAction) -> boolean
 // *** Check if alt is valid altAction.
+// *** An altAction must be a 2-element array of [positive, negative] chain
+// *** actions, where each element is either a string (the action name) or
+// *** the literal `false` (no chain for that branch). See README "chaining"
+// *** and the `behavior` row shape in the FSM definition.
             if ( !(alt instanceof Array) )   return false
             if ( alt.length != 2         )   return false
-            alt.forEach ( m => {
-                            if ( m !== false ||  typeof m != 'string' )    return false
-                    })
-            return true
+            return alt.every ( m => m === false || typeof m === 'string' )
   } // _isAltValid func.
        
 
