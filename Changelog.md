@@ -1,6 +1,15 @@
 ## Release History
 
 
+### 5.2.7 ( 2026-07-22)
+- [x] Fix: `_isAltValid` accepted any 2-element array (broken `forEach` — return value was ignored). Now rejects anything outside `[string, false]` before the chain action is registered;
+- [x] Fix: `_updateStateData` (and `queryStateUpdate.js`) treated any object with a truthy `export` key as a dt-object, breaking patches like `{ export: 'csv-format', existing: 'after' }`. Now checks `typeof export === 'function'` — same fix applied to both files;
+- [x] Cleanup: removed stale `src/queryStateUpdate.js` (exported but never imported — duplicated logic from `_updateStateData.js`, and not part of the rollup bundle);
+- [x] Tests: +10 regression tests (8 for `_isAltValid`, 2 for export-detection). 19 → 29 passing, no regressions;
+- [x] Cleanup: removed `probe-bugs.mjs` scratch file;
+
+
+
 ### 5.2.6 ( 2026-07-21)
 - [x] Dependency update: ask-for-promise@3.2.0;
 - [x] Dependency update: dt-toolbox@7.4.8;
