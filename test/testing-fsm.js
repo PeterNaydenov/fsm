@@ -862,6 +862,281 @@ describe ( 'Finite State Machine', () => {
                       fsm.update ( 'start' )
           }) // it ExtractList as dt-object
 
+
+
+
+    // =====================================================================
+    // BUG REGRESSIONS
+    // =====================================================================
+    //
+    // Both of the following are real bugs that have been fixed. They stay
+    // as regression tests so the contract can't silently drift back.
+
+    describe ( 'Bug regressions', () => {
+
+        // -----------------------------------------------------------------
+        // BUG 1 — _isAltValid had a tautological check.
+        //
+        // Original code:
+        //     alt.forEach ( m => {
+        //         if ( m !== false ||  typeof m != 'string' )    return false
+        //     })
+        //     return true
+        //
+        // `forEach` ignores the callback's return value, so the inner
+        // `return false` was a no-op and the function always returned
+        // `true` for any 2-element array. As a result, an alt like
+        // `[null, "useGenerator"]` was accepted, the chain action
+        // `["none/activate"]` got registered with `[null, "useGenerator"]`,
+        // and when the negative branch fired `_updateStep` would try to
+        // dispatch an action whose name is `null` — silently broken
+        // (the lookup would just miss, no transition would run).
+        //
+        // The fix uses `every()` and a single valid-element predicate.
+        // A 2-element array whose elements are all `string | false` is
+        // valid; anything else is not.
+        // -----------------------------------------------------------------
+        it ( 'rejects alt with [null, "actionName"] (BUG 1)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                            // [null, "useGen"] should be invalid:
+                                            // index 0 is `null`, not a string and not `false`.
+                                              [ 'none', 'activate', 'active', 'switchON', [ null, 'useGenerator' ] ]
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true   // gives us debugFSM to inspect chainActions
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+
+                // chainActions['none/activate'] must NOT exist because the
+                // alt row was malformed. Before the fix it was created
+                // with value [null, 'useGenerator'].
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) )
+                    .to.equal ( undefined )
+        }) // it BUG 1 — null
+
+        it ( 'rejects alt with [123, "actionName"] (BUG 1)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ 123, 'useGenerator' ] ]
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+        }) // it BUG 1 — number
+
+        it ( 'rejects alt with [{}, "actionName"] (BUG 1)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ {}, 'useGenerator' ] ]
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+        }) // it BUG 1 — object
+
+        it ( 'rejects alt with [true, "actionName"] (BUG 1)', () => {
+            // `true` is truthy and not a string — should be rejected.
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ true, 'useGenerator' ] ]
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+        }) // it BUG 1 — true
+
+        it ( 'rejects alt that is not an array (BUG 1)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', 'useGenerator' ]   // a string, not an array
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+        }) // it BUG 1 — non-array alt
+
+        it ( 'rejects alt that is the wrong length (BUG 1)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ 'useGenerator' ] ]   // length 1
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+        }) // it BUG 1 — wrong length
+
+        it ( 'accepts valid alt [false, "actionName"] (BUG 1 — positive case)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ false, 'useGenerator' ] ]
+                                            , [ 'none', 'useGenerator', 'alt', 'altOn' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   altOn    ({task}) { task.done ({ success : true }) }
+                        });
+                // Valid alt is registered. [0] is `false` (no positive
+                // chain), [1] is the action name for the negative chain.
+                const entry = fsm_chainActions_of ( fsm, 'none/activate' )
+                expect ( entry ).to.be.an ( 'array' )
+                expect ( entry[0] ).to.equal ( false )
+                expect ( entry[1] ).to.equal ( 'useGenerator' )
+        }) // it BUG 1 — valid
+
+        it ( 'accepts valid alt ["actionA", "actionB"] (BUG 1 — both branches)', () => {
+            const fsm = new Fsm ({
+                                init : 'none'
+                            ,   behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON', [ 'chainA', 'chainB' ] ]
+                                            , [ 'none', 'chainA', 'aState', 'onA' ]
+                                            , [ 'none', 'chainB', 'bState', 'onB' ]
+                                        ]
+                            ,   debug : true
+                        }, {
+                                switchON ({task}) { task.done ({ success : true }) }
+                            ,   onA      ({task}) { task.done ({ success : true }) }
+                            ,   onB      ({task}) { task.done ({ success : true }) }
+                        });
+                const entry = fsm_chainActions_of ( fsm, 'none/activate' )
+                expect ( entry[0] ).to.equal ( 'chainA' )
+                expect ( entry[1] ).to.equal ( 'chainB' )
+        }) // it BUG 1 — both branches
+
+        // -----------------------------------------------------------------
+        // BUG 2 — _updateStateData mis-detected objects with a truthy
+        // `export` property as dt-objects.
+        //
+        // Original code:
+        //     if ( updateObject.export )   updateType = 'dt-object'
+        //
+        // A transition that legitimately returns e.g. `{ export: 'csv' }`
+        // (any truthy `export` key) was being routed through the dt-object
+        // path, which calls `dtbox.load(updateObject).query(...)`. Plain
+        // JS objects don't have `.query()` — TypeError: undefined is not
+        // a function. The state update silently failed.
+        //
+        // The fix checks `typeof updateObject.export === 'function'`,
+        // which only matches a real dt-object.
+        // -----------------------------------------------------------------
+        it ( 'accepts an updateObject with a truthy non-function "export" property (BUG 2)', done => {
+                // A common case: the user happens to have a top-level
+                // property called `export` on the patch (e.g. exporting a
+                // file, an "export" flag in the data). The library must
+                // NOT misdetect this as a dt-object.
+                const
+                      lib = {
+                                switchON ({ task, extractList, dependencies }) {
+                                        const update = {
+                                              export     : 'csv-format'      // truthy, but not a function
+                                            , existing   : 'after'           // updates the existing field
+                                        };
+                                        task.done ({
+                                              success   : true
+                                            , stateData : update
+                                        })
+                                    }
+                            }
+                    , machine = {
+                                  init : 'none'
+                                , behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON' ]
+                                            ]
+                                , stateData : { existing: 'before' }
+                            }
+                    ;
+                const fsm = new Fsm ( machine, lib );
+                fsm.update ( 'activate' )
+                   .then ( () => {
+                                // The update succeeded and the existing
+                                // field is updated. Before the fix, this
+                                // would have thrown inside `_updateStateData`
+                                // ("updateObject.query is not a function")
+                                // and the state would never have been
+                                // touched.
+                                const r = fsm.extractList (['existing']);
+                                expect ( r[0] ).to.equal ( 'after' )
+                                done ()
+                        }, done )
+        }) // it BUG 2 — truthy non-function export
+
+        it ( 'still detects a real dt-object (BUG 2 — positive case)', done => {
+                // A real dt-object exposes `.export()` and `.query()`.
+                // Make sure the type detection still works after the fix.
+                const
+                      lib = {
+                                switchON ({ task, extractList, dependencies }) {
+                                        const { dtbox } = dependencies;
+                                        const update = dtbox.init ({ existing: 'from-dt-object' });
+                                        task.done ({
+                                              success   : true
+                                            , stateData : update
+                                        })
+                                    }
+                            }
+                    , machine = {
+                                  init : 'none'
+                                , behavior : [
+                                              [ 'none', 'activate', 'active', 'switchON' ]
+                                            ]
+                                , stateData : { existing: 'before' }
+                            }
+                    ;
+                const fsm = new Fsm ( machine, lib );
+                fsm.update ( 'activate' )
+                   .then ( () => {
+                                const r = fsm.extractList (['existing']);
+                                expect ( r[0] ).to.equal ( 'from-dt-object' )
+                                done ()
+                        }, done )
+        }) // it BUG 2 — real dt-object
+
+    }) // describe Bug regressions
+
+
 }) // describe
+
+
+// Helper: read `fsm.chainActions[key]` from the fsm instance behind the
+// public API. The public `new Fsm(...)` returns the api object, but the
+// private storage is on the fsm instance — accessed here via the `api`
+// methods. We expose it through the `debug` mode global.
+function fsm_chainActions_of ( fsm, key ) {
+        // The `fsm` argument is the value returned by `new Fsm(...)`, i.e.
+        // the api object. When the machine has `debug: true`, the
+        // constructor stashes the full fsm instance on the global
+        // `debugFSM`. We just look it up.
+        return globalThis.debugFSM.chainActions[key]
+}
 
 
