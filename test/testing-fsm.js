@@ -1,20 +1,19 @@
-
 import Fsm from '../src/main.js'
-import { expect } from 'chai'
+import { describe, it, expect } from 'vitest'
 import dtbox from 'dt-toolbox'
 
 
 
 describe ( 'Finite State Machine', () => {
-    
 
 
-    it ( 'Check FSM structure', done => {
+
+    it ( 'Check FSM structure', async () => {
             // SETUP - provide machine description and transition library.
-            const 
+            const
                     lib   = {
                                 switchON ({task}) {
-                                        setTimeout ( () => task.done ({ success : true }),   100 ) 
+                                        setTimeout ( () => task.done ({ success : true }),   100 )
                                     } // switchOn func.
                         }
                   , machine = {
@@ -31,33 +30,32 @@ describe ( 'Finite State Machine', () => {
             // Create fsm. Inspect all expected values.
             const fsm = new Fsm ( machine, lib );
 
-            fsm.update ( 'activate' )                 // State from 'none' to 'active'
-               .then ( () => fsm.update ( 'stop' ))   // Will not change anything. Transition is not defined
-               .then ( () => {
-                        expect ( debugFSM.state        ).to.be.equal ( 'active' )
-                        const stateData = debugFSM.stateData.model(()=>({as:'std'}));
-                        expect ( stateData ).to.be.empty
-                        const initStateData = debugFSM.initialStateData.model(()=>({as:'std'}));
-                        expect ( initStateData ).to.be.empty
-                        
-                        expect ( Fsm.dependencies ).to.have.property ( 'askForPromise' )
-                        expect ( Fsm.dependencies ).to.have.property ( 'dtbox' )
-                        expect ( Fsm.dependencies ).to.have.property ( 'walk' )
-            
-                        expect ( debugFSM.transitions ).to.have.property ( 'none/activate' )
-                        expect ( debugFSM.transitions ).to.have.property ( 'active/stop'   )
+            await fsm.update ( 'activate' )                 // State from 'none' to 'active'
+            await fsm.update ( 'stop' )                     // Will not change anything. Transition is not defined
 
-                        expect ( debugFSM.transitions['none/activate'] ).to.be.a('function')
-                        expect ( debugFSM.transitions['active/stop'] ).to.be.equal(null)
-                        
-                        expect ( debugFSM.nextState).to.have.property ( 'none/activate' )
-                        expect ( debugFSM.nextState).to.have.property ( 'active/stop'   )
-            
-                        expect ( debugFSM.nextState['none/activate'] ).to.be.equal ( 'active' )
-                        expect ( debugFSM.nextState['active/stop'] ).to.be.equal ( 'none' )
-                        done ()
-                    })
+            expect ( debugFSM.state        ).toBe ( 'active' )
+            const stateData = debugFSM.stateData.model(()=>({as:'std'}));
+            expect ( stateData ).toEqual ( {} )
+            const initStateData = debugFSM.initialStateData.model(()=>({as:'std'}));
+            expect ( initStateData ).toEqual ( {} )
+
+            expect ( Fsm.dependencies ).toHaveProperty ( 'askForPromise' )
+            expect ( Fsm.dependencies ).toHaveProperty ( 'dtbox' )
+            expect ( Fsm.dependencies ).toHaveProperty ( 'walk' )
+
+            expect ( debugFSM.transitions ).toHaveProperty ( 'none/activate' )
+            expect ( debugFSM.transitions ).toHaveProperty ( 'active/stop'   )
+
+            expect ( debugFSM.transitions['none/activate'] ).toBeTypeOf ( 'function' )
+            expect ( debugFSM.transitions['active/stop'] ).toBeNull ()
+
+            expect ( debugFSM.nextState).toHaveProperty ( 'none/activate' )
+            expect ( debugFSM.nextState).toHaveProperty ( 'active/stop'   )
+
+            expect ( debugFSM.nextState['none/activate'] ).toBe ( 'active' )
+            expect ( debugFSM.nextState['active/stop'] ).toBe ( 'none' )
         }) // it minimal working configuration
+
 
 
 
@@ -65,10 +63,10 @@ describe ( 'Finite State Machine', () => {
 
     it ( 'Default dependencies', () => {
                 // SETUP - provide machine description and transition library.
-                const 
+                const
                         lib   = {
                                     switchON ( {task}) {
-                                            setTimeout ( () => task.done ({ success : true }),   100 ) 
+                                            setTimeout ( () => task.done ({ success : true }),   100 )
                                         } // switchOn func.
                             }
                       , machine = {
@@ -81,21 +79,22 @@ describe ( 'Finite State Machine', () => {
                               }
                     ;
                 // Create fsm. Inspect all expected values.
-                const 
+                const
                         fsm = new Fsm ( machine, lib )
                       , dependencies = fsm.getDependencies ()
                       ;
-                expect ( dependencies ).to.have.property ( 'walk' )
-                expect ( dependencies ).to.have.property ( 'askForPromise' )
+                expect ( dependencies ).toHaveProperty ( 'walk' )
+                expect ( dependencies ).toHaveProperty ( 'askForPromise' )
         }) // it default dependencies
 
 
 
 
 
-    it ( 'Read "stateData" from transition function. Provide update-response.', () => {
+
+    it ( 'Read "stateData" from transition function. Provide update-response.', async () => {
         // *** Convert stateData to update-response
-            const 
+            const
                   lib   = {
                                 switchON ({task,extractList}) {
                                         const [ say ] = extractList (['say']);
@@ -114,20 +113,20 @@ describe ( 'Finite State Machine', () => {
                         }
                 ;
             const fsm = new Fsm ( machine, lib );
-            fsm.update ( 'activate' )
-               .then ( result => {
-                        expect ( result ).to.have.property ( 'say' )
-                        expect ( result.say ).to.be.equal ( 'hi' )
-                    })
+            const result = await fsm.update ( 'activate' )
+            expect ( result ).toHaveProperty ( 'say' )
+            expect ( result.say ).toBe ( 'hi' )
         }) // it Read 'stateData' from transition func.
 
 
 
 
 
-    it ( 'Use dependencies', () => {
+
+
+    it ( 'Use dependencies', async () => {
             // *** Convert dependencies to update-response
-                const 
+                const
                       lib   = {
                                     switchON ({
                                                   task
@@ -152,28 +151,27 @@ describe ( 'Finite State Machine', () => {
                     ;
                 const fsm = new Fsm ( machine, lib );
                 fsm.setDependencies ({test})
-                fsm.update ( 'activate' )
-                   .then ( result => {
-                                expect ( result ).to.have.property ( 'say' )
-                                expect ( result.say ).to.be.equal ( 'hi' )
-                        })
+                const result = await fsm.update ( 'activate' )
+                expect ( result ).toHaveProperty ( 'say' )
+                expect ( result.say ).toBe ( 'hi' )
             }) // it   Use 'dependencies'
 
 
 
 
 
-    it ( 'Reset ', done => {
+
+    it ( 'Reset ', async () => {
                 // *** Reset fsm state and stateData
-                    const 
+                    const
                           lib   = {
                                         switchON ({task,extractList}) {
                                                 const [ test ] = extractList ([ 'test' ]);
                                                 test.say =  'yo-ho-ho'
                                                 const name = 'John';
-                                                task.done ({ 
+                                                task.done ({
                                                             success : true
-                                                          , stateData : { test, name } 
+                                                          , stateData : { test, name }
                                                         })
                                             }
                                         , switchOFF ( task ) {
@@ -187,10 +185,10 @@ describe ( 'Finite State Machine', () => {
                                                       [ 'none',   'activate', 'active', 'switchON'  ]
                                                     , [ 'active', 'stop',     'none',   'switchOFF' ]
                                                 ]
-                                        , stateData : { 
+                                        , stateData : {
                                                             name : 'Peter'
-                                                          , test: { 
-                                                                      say : 'hi' 
+                                                          , test: {
+                                                                      say : 'hi'
                                                                     , owner : {
                                                                                   name : 'Peter'
                                                                                 , age  : 49
@@ -200,38 +198,37 @@ describe ( 'Finite State Machine', () => {
                                                                                               , number : 75
                                                                                         }
                                                                           }
-                                                                  } 
+                                                                  }
                                                   }
                                 }
                         ;
                     const fsm = new Fsm ( machine, lib );
-    
-                    fsm.update ( 'activate' )
-                         .then ( () => {
-                                const [r1, r2, q1] = fsm.extractList ( ['root', 'test', 'name' ]);
 
-                                expect ( fsm.getState() ).to.be.equal ( 'active' )
-                                expect ( r1.name ).to.be.equal ( 'John')             // Requesting a 'root' will return object with all primitive state data fields
-                                expect ( q1      ).to.be.equal ( 'John' )            // Requesting a prop will returns a primitive value
-                                expect ( r2      ).to.have.property ( 'say' )
-                                expect ( r2.say  ).to.be.equal ( 'yo-ho-ho' )
-                                
-                                fsm.reset ()   // Should change 'state' and 'stateData' to initial values
-                                expect ( fsm.getState()   ).to.be.equal ( machine.init )
-                                const [ r3, r4 ] = fsm.extractList (['root', 'test'])
+                    await fsm.update ( 'activate' )
 
-                                expect ( r3.name ).to.be.equal ( 'Peter' )
-                                expect ( r4.say  ).to.be.equal ( 'hi' )
-                                done ()
-                            })
+                    const [r1, r2, q1] = fsm.extractList ( ['root', 'test', 'name' ]);
+
+                    expect ( fsm.getState() ).toBe ( 'active' )
+                    expect ( r1.name ).toBe ( 'John')             // Requesting a 'root' will return object with all primitive state data fields
+                    expect ( q1      ).toBe ( 'John' )            // Requesting a prop will returns a primitive value
+                    expect ( r2      ).toHaveProperty ( 'say' )
+                    expect ( r2.say  ).toBe ( 'yo-ho-ho' )
+
+                    fsm.reset ()   // Should change 'state' and 'stateData' to initial values
+                    expect ( fsm.getState()   ).toBe ( machine.init )
+                    const [ r3, r4 ] = fsm.extractList (['root', 'test'])
+
+                    expect ( r3.name ).toBe ( 'Peter' )
+                    expect ( r4.say  ).toBe ( 'hi' )
                 }) // it reset
 
 
 
 
 
+
     it ( 'GetState', () => {
-                    const 
+                    const
                           lib   = {
                                         switchON ( {task, dependencies, state } ) {
                                                 let stateData = { say : 'yo-ho-ho'}
@@ -251,25 +248,27 @@ describe ( 'Finite State Machine', () => {
                                         , stateData : { say:'hi' }
                                 }
                         ;
-                    
-                    const 
+
+                    const
                           fsm    = new Fsm ( machine, lib )
                         , result = fsm.getState ()
                         ;
-                    expect ( result ).to.be.equal ( 'none' )
+                    expect ( result ).toBe ( 'none' )
                 }) // it getState
 
 
 
 
-    it ( 'Missing init', done => {
-                    const 
+
+
+    it ( 'Missing init', async () => {
+                    const
                           lib   = {
                                         switchON ( {task} ) {
                                                 task.done ({ success : true })
                                             }
                                         , switchOFF ( {task} ) {
-                                                task.done ({ success: true })
+                                                task.done ({ success : true })
                                             }
                                 }
                         , machine = {
@@ -281,26 +280,25 @@ describe ( 'Finite State Machine', () => {
                                 }
                         ;
                     const fsm = new Fsm ( machine, lib );
-                    fsm.update ( 'activate' )
-                       .then ( () => {
-                                const r = fsm.getState ();
-                                expect ( r ).to.be.equal ( 'N/A' )
-                                done ()
-                            })
+                    await fsm.update ( 'activate' )
+
+                    const r = fsm.getState ();
+                    expect ( r ).toBe ( 'N/A' )
                 }) // it Missing init
 
 
 
 
 
-    it ( 'Missing lib', done => {
-                    const 
+
+    it ( 'Missing lib', async () => {
+                    const
                           lib   = {
                                         switchON ( {task} ) {
                                                 task.done ({ success : true })
                                             }
                                         , switchOFF ( {task} ) {
-                                                task.done ({ success: true })
+                                                task.done ({ success : true })
                                             }
                                 }
                         , machine = {
@@ -313,20 +311,21 @@ describe ( 'Finite State Machine', () => {
                                 }
                         ;
                     const fsm = new Fsm ( machine );  // Argument 'lib' was forgotten.
-                    fsm.update ( 'activate' )
-                       .then ( () => {
-                                const r = fsm.getState ();
-                                expect ( r ).to.be.equal ( 'none' )
-                                done ()
-                            })
+                    await fsm.update ( 'activate' )
+
+                    const r = fsm.getState ();
+                    expect ( r ).toBe ( 'none' )
                 }) // it Missing lib
-        
 
 
 
-                
-    it ( 'Chain-action on failure', done => {
-                    const 
+
+
+
+
+
+    it ( 'Chain-action on failure', async () => {
+                    const
                           lib   = {
                                         switchON ( {task} ) {
                                                 task.done ({ success : false })
@@ -349,21 +348,19 @@ describe ( 'Finite State Machine', () => {
                                 }
                         ;
                     const fsm = new Fsm ( machine, lib );
-                    fsm.update ( 'activate' )
-                       .then ( 
-                            () => {
-                                    const r = fsm.getState ();
-                                    expect ( r ).to.be.equal ( 'alternativeSource' )
-                                    done ()
-                                })
+                    await fsm.update ( 'activate' )
+
+                    const r = fsm.getState ();
+                    expect ( r ).toBe ( 'alternativeSource' )
                 }) // it Chain-action on failure
 
 
 
 
 
-    it ( 'Subscribe for "update", "transition", "positive", "negative"', done => {
-                    const 
+
+    it ( 'Subscribe for "update", "transition", "positive", "negative"', async () => {
+                    const
                           lib   = {
                                         switchON ( {task} ) {
                                                 task.done ({ success : false })
@@ -388,29 +385,30 @@ describe ( 'Finite State Machine', () => {
                     const fsm = new Fsm ( machine, lib );
                     let count = 0;
                     fsm.on ( 'negative', state => {
-                                expect ( state ).to.be.equal ( 'none' )
+                                expect ( state ).toBe ( 'none' )
                          })
                     fsm.on ( 'transition', ( state, response) => {
-                                if ( count == 0 )   expect ( state ).to.be.equal ( 'none'              )
-                                else                expect ( state ).to.be.equal ( 'alternativeSource' )
+                                if ( count == 0 )   expect ( state ).toBe ( 'none'              )
+                                else                expect ( state ).toBe ( 'alternativeSource' )
                                 count++
                           })
                     fsm.on ( 'positive', ( state, response) => {
-                                expect ( state ).to.be.equal ( 'alternativeSource' )
+                                expect ( state ).toBe ( 'alternativeSource' )
                           })
                     fsm.on ( 'update', ( state, response ) => {
-                                expect ( state ).to.be.equal ( 'alternativeSource' )
+                                expect ( state ).toBe ( 'alternativeSource' )
                           })
-                    fsm.update ( 'activate' )
-                    done ()
+                    await fsm.update ( 'activate' )
           }) // it Subscribe for "update", "transition", "positive", "negative"
-    
 
 
 
 
-    it ( 'Subscribe for update with chainActions', () => { 
-                    const 
+
+
+
+    it ( 'Subscribe for update with chainActions', () => {
+                    const
                           machine = {
                                       init :  'none'
                                     , behavior : [
@@ -426,7 +424,7 @@ describe ( 'Finite State Machine', () => {
                                             }
                                       , altOn ( {task, dependencies, state, extractList}, data ) {
                                                 task.done ({ success : true, response: 'altON'})
-                                            } 
+                                            }
                                   }
                           ;
                         let counter = 0;
@@ -434,9 +432,9 @@ describe ( 'Finite State Machine', () => {
                         const fsm = new Fsm ( machine, lib );
                         fsm.on ( 'update', (state, data) => {
                                                     counter ++
-                                                    expect ( counter ).to.be.equal ( 1 )
+                                                    expect ( counter ).toBe ( 1 )
                                 })
-                        fsm.update ( 'activate' )
+                        return fsm.update ( 'activate' )
           })  // it subscribe for update with chainActions
 
 
@@ -444,8 +442,8 @@ describe ( 'Finite State Machine', () => {
 
 
 
-    it ( 'Multiple updates', done => {
-                        const 
+    it ( 'Multiple updates', async () => {
+                        const
                               lib   = {
                                             switchON ( {task, dependencies, state, extractList}, data ) {
                                                     setTimeout ( () => task.done ({ success : true, response:data }), 220 )
@@ -454,7 +452,7 @@ describe ( 'Finite State Machine', () => {
                                                     task.done ({success: true})
                                                 }
                                             , switchOFF ( {task, dependencies, state, extractList}, data ) {
-                                                    setTimeout ( () => task.done ({ success: true, response: data }), 90 )
+                                                    setTimeout ( () => task.done ({ success : true, response: data }), 90 )
                                                 }
                                     }
                             , machine = {
@@ -471,29 +469,29 @@ describe ( 'Finite State Machine', () => {
                         let count = 0;
                         fsm.on ( 'update', ( state, response ) => {
                                     if ( count == 0 ) {
-                                          expect ( state ).to.be.equal ( 'active' )
-                                          expect ( response ).to.be.equal ( 'try' )
+                                          expect ( state ).toBe ( 'active' )
+                                          expect ( response ).toBe ( 'try' )
                                           count++
                                           fsm.update ( 'stop', 'second' )
                                       }
                                     else {
-                                          expect ( state ).to.be.equal ( 'none' )
-                                          expect ( response ).to.be.equal ( 'second' )
-                                          done ()
+                                          expect ( state ).toBe ( 'none' )
+                                          expect ( response ).toBe ( 'second' )
                                       }
                               })
-                        fsm.update ( 'activate', 'try' )
+                        await fsm.update ( 'activate', 'try' )
           }) // it Multiple updates
 
-    
-    
-    
 
-    it ( 'Prevent simultaneous updates', done => {
-                    const 
+
+
+
+
+    it ( 'Prevent simultaneous updates', async () => {
+                    const
                         description = {
                                           init  : 'center'
-                                        , behavior : [ 
+                                        , behavior : [
                                                           [ 'center', 'goLeft', 'left', 'gotoLeft'    ]
                                                         , [ 'center', 'goRight', 'right', 'gotoRight' ]
                                                         , [ 'left'  , 'goRight', 'center', 'failure'  ]
@@ -502,10 +500,10 @@ describe ( 'Finite State Machine', () => {
                         , transitions = {
                                   gotoLeft ( {task} ) {
                                             setTimeout ( () => {
-                                                    task.done ({ 
+                                                    task.done ({
                                                                   success : true
                                                                 , response  : 'Aloha'
-                                                            }) 
+                                                            })
                                                 }, 300)
                                             }
                                 , gotoRight ( {task, dependencies, extractList}, dt ) {
@@ -521,7 +519,7 @@ describe ( 'Finite State Machine', () => {
                                                     })
                                         }
                             }
-                    const 
+                    const
                           fsm          = new Fsm ( description, transitions )
                         , askForPromise = fsm.getDependencies ().askForPromise
                         , task1        = askForPromise ()
@@ -530,45 +528,43 @@ describe ( 'Finite State Machine', () => {
                         ;
 
                     let resultState = 'none';
-                    
-                    fsm.update ( 'goLeft' )
-                       .then ( r => {
-                            expect ( resultState ).to.be.equal ( 'none' )
-                            expect ( r ).to.be.equal ( 'Aloha' )
-                            resultState = 'left'
-                            task1.done ()
-                        })
-                    fsm.update ( 'goRight', 'right from left' )
-                       .then ( r => {
-                                const state = fsm.getState ();
-                                expect ( resultState ).to.be.equal ( 'left' )
-                                expect ( state ).to.be.equal ( 'center' )
-                                expect ( r ).to.be.equal ( 'right from left' )
-                                resultState = 'center'
-                                task2.done ()
-                        })
-                    fsm.update ( 'goRight' )
-                       .then ( r => {
-                                const state = fsm.getState ();
-                                expect ( resultState ).to.be.equal ( 'center' )
-                                expect ( state ).to.be.equal ( 'right' )
-                                expect ( r ).to.be.equal ( 'Guten tag' )
-                                task3.done ()
-                        })
-                        
-                    Promise.all ([
-                                      task1.promise
-                                    , task2.promise
-                                    , task3.promise
-                              ])
-                         .then ( () =>  done ()   )
+
+                    const updates = [
+                          fsm.update ( 'goLeft' )
+                             .then ( r => {
+                                    expect ( resultState ).toBe ( 'none' )
+                                    expect ( r ).toBe ( 'Aloha' )
+                                    resultState = 'left'
+                                    task1.done ()
+                                })
+                        , fsm.update ( 'goRight', 'right from left' )
+                             .then ( r => {
+                                    const state = fsm.getState ();
+                                    expect ( resultState ).toBe ( 'left' )
+                                    expect ( state ).toBe ( 'center' )
+                                    expect ( r ).toBe ( 'right from left' )
+                                    resultState = 'center'
+                                    task2.done ()
+                                })
+                        , fsm.update ( 'goRight' )
+                             .then ( r => {
+                                    const state = fsm.getState ();
+                                    expect ( resultState ).toBe ( 'center' )
+                                    expect ( state ).toBe ( 'right' )
+                                    expect ( r ).toBe ( 'Guten tag' )
+                                    task3.done ()
+                                })
+                        ]
+
+                    await Promise.all ( updates )
                 }) // it prevent simultaneous updates
 
 
 
 
 
-    it ( 'Export State', done => {
+
+    it ( 'Export State', async () => {
                     const
                           description = {
                                                init : 'none'
@@ -576,17 +572,17 @@ describe ( 'Finite State Machine', () => {
                                                             [ 'none', 'start', 'initial', 'startUp' ]
                                                           , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                        ]
-                                            , stateData : { 
+                                            , stateData : {
                                                               'duringStart' : 'none'
                                                            , 'duringFireUp' : 'none'
                                                         }
                                 }
                         , transitions = {
                                             startUp ( {task, dependencies, extractList}, dt ) {
-                                                        const 
+                                                        const
                                                               duringStart = 'one'
                                                             , test = { name : 'Peter' }
-                                                            ; 
+                                                            ;
                                                         const response = {
                                                                           success : true
                                                                         , stateData : { duringStart, test }
@@ -607,21 +603,20 @@ describe ( 'Finite State Machine', () => {
                         ;
                     const fsm = new Fsm ( description, transitions );
 
-                    fsm.update ( 'start' )
-                       .then ( x => fsm.update ( 'move' ))
-                       .then ( x => {
-                                    const result = fsm.exportState ();
-                                    const [ r1, r2, r3 ] = dtbox
-                                                            .load ( result.stateData )
-                                                            .extractList (['duringStart', 'duringFireUp', 'test' ], {as:'std'}) 
-                                    expect ( r1 ).to.be.equal ( 'one' )
-                                    expect ( r2 ).to.be.equal ( 'second' )
-                                    expect ( result.state ).to.be.equal ( 'active' )
-                                    expect ( r3 ).to.be.null   // null because 'test' is not defined in the machine description
-                                    done ()
-                            })
+                    await fsm.update ( 'start' )
+                    await fsm.update ( 'move' )
+
+                    const result = fsm.exportState ();
+                    const [ r1, r2, r3 ] = dtbox
+                                            .load ( result.stateData )
+                                            .extractList (['duringStart', 'duringFireUp', 'test' ], {as:'std'})
+                    expect ( r1 ).toBe ( 'one' )
+                    expect ( r2 ).toBe ( 'second' )
+                    expect ( result.state ).toBe ( 'active' )
+                    expect ( r3 ).toBeNull ()   // null because 'test' is not defined in the machine description
                }) // it Export State
-            
+
+
 
 
 
@@ -641,17 +636,18 @@ describe ( 'Finite State Machine', () => {
                                   state     : 'imported'
                                 , stateData : [['root', { in : true }, 'root', []   ]]
                             })
-                    
-                    expect ( fsm.getState() ).to.be.equal ( 'imported' )
+
+                    expect ( fsm.getState() ).toBe ( 'imported' )
                     const [ r1 ] = fsm.extractList ( ['in'])
-                    expect ( r1 ).to.be.true
+                    expect ( r1 ).toBe ( true )
         }) // it Import externalState
 
 
 
 
 
-    it ( 'Ignore Cached Updates', done => {
+
+    it ( 'Ignore Cached Updates', async () => {
                     const
                               machine = {
                                               init  : 'none'
@@ -659,7 +655,7 @@ describe ( 'Finite State Machine', () => {
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                         ]
-                                            , stateData : { 
+                                            , stateData : {
                                                             yo: 'hi'
                                                           , wrong: false
                                                           }
@@ -668,14 +664,14 @@ describe ( 'Finite State Machine', () => {
                                        startUp ({ task }) {
                                             // Use setTimeout to keep task unresolved for a while.
                                             setTimeout ( () => {
-                                                    task.done ({ 
-                                                                  success   : true 
+                                                    task.done ({
+                                                                  success   : true
                                                                 , stateData : { yo:'hello' }
                                                             })
                                                 }, 200 )
                                           } // startUp func.
                                     , fireUp ({ task }) {
-                                                task.done ({ 
+                                                task.done ({
                                                               success : true
                                                             , stateData :  { 'wrong' : true }
                                                         })
@@ -689,32 +685,32 @@ describe ( 'Finite State Machine', () => {
                      *      1. Update 'start';
                      *      2. Update 'move';
                      *      3. Ignore cached 'move';
-                     * 
-                     * */ 
+                     *
+                     * */
                     fsm.update ( 'start' ) // -> will call 'startUp' transition
-                       .then ( x =>  fsm.ignoreCachedUpdates () )  
+                       .then ( x =>  fsm.ignoreCachedUpdates () )
 
-                    fsm.update ( 'move' ) // Call next transition before 'startUp' is finished.
-                       .then ( x => {   // Positive response
-                                          expect ( null ).to.be.equal ( 1 )   // Positive response should not be called.
-                                          done ()
-                                  }
-                              , x => {   //---> ignoreCachedUpdates should move logic here. X will contain error message produced by fsm.
+                    try {
+                        await fsm.update ( 'move' ) // Call next transition before 'startUp' is finished.
+                        // Positive response should not be called.
+                        expect ( null ).toBe ( 1 )
+                    }
+                    catch (x) {   //---> ignoreCachedUpdates should move logic here. X will contain error message produced by fsm.
                                           result = fsm.exportState ()
                                           const [ r1, r2 ] = fsm.extractList (['yo', 'wrong'])
-                                          expect ( result.state ).to.be.equal ( 'initial' )
-                                          expect ( r1 ).to.be.equal ( 'hello' )
-                                          expect ( r2 ).to.be.false
-                                          expect ( x ).to.be.equal ( "Action 'move' was ignored" )
-                                          done ()
-                                  })
+                                          expect ( result.state ).toBe ( 'initial' )
+                                          expect ( r1 ).toBe ( 'hello' )
+                                          expect ( r2 ).toBe ( false )
+                                          expect ( x ).toBe ( "Action 'move' was ignored" )
+                                  }
                }) // it Ignore cached updates
 
 
 
 
 
-      it ( 'extractList', done => {
+
+      it ( 'extractList', async () => {
                     const
                               machine = {
                                               init  : 'none'
@@ -722,7 +718,7 @@ describe ( 'Finite State Machine', () => {
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                         ]
-                                            , stateData : { 
+                                            , stateData : {
                                                             yo: 'hi'
                                                           , wrong: false
                                                           , deep : { prop: 12, prop2: 'hi' }
@@ -731,17 +727,17 @@ describe ( 'Finite State Machine', () => {
                             , transitions = {
                                        startUp ({ task, extractList }) {
                                             const stateDataExtraction = extractList ();
-                                            expect ( stateDataExtraction ).to.be.deep.equal ( machine.stateData )
+                                            expect ( stateDataExtraction ).toEqual ( machine.stateData )
                                             // Use setTimeout to keep task unresolved for a while.
                                             setTimeout ( () => {
-                                                    task.done ({ 
-                                                                  success   : true 
+                                                    task.done ({
+                                                                  success   : true
                                                                 , stateData : { yo:'hello' }
                                                             })
                                                 }, 200 )
                                           } // startUp func.
                                     , fireUp ({ task }) {
-                                                task.done ({ 
+                                                task.done ({
                                                               success : true
                                                             , stateData :  { 'wrong' : true }
                                                         })
@@ -750,23 +746,21 @@ describe ( 'Finite State Machine', () => {
                             ;
 
                     const fsm = new Fsm ( machine, transitions );
-                    fsm.update ( 'start' )
-                       .then ( x => {                                
-                                expect ( x ).to.be.undefined
-                                let stData = fsm.extractList (); // extractList without arguments returns all stateData as a single object.
-                                expect ( stData.yo ).to.be.equal ( 'hello' )
-                                expect ( stData.wrong ).to.be.false
-                                expect ( stData.deep.prop ).to.be.equal ( 12 )
-                                expect ( stData.deep.prop2 ).to.be.equal ( 'hi' )
-                                done ()
-                            })
+                    await fsm.update ( 'start' )
+
+                    let stData = fsm.extractList (); // extractList without arguments returns all stateData as a single object.
+                    expect ( stData.yo ).toBe ( 'hello' )
+                    expect ( stData.wrong ).toBe ( false )
+                    expect ( stData.deep.prop ).toBe ( 12 )
+                    expect ( stData.deep.prop2 ).toBe ( 'hi' )
               }) // it extractList
 
 
 
 
 
-      it ( 'Change stateData as dt-model and dt-object', done => {
+
+      it ( 'Change stateData as dt-model and dt-object', async () => {
                         const
                               machine = {
                                               init  : 'none'
@@ -774,7 +768,7 @@ describe ( 'Finite State Machine', () => {
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                             , [ 'initial', 'move', 'active', 'fireUp'  ]
                                                         ]
-                                            , stateData : { 
+                                            , stateData : {
                                                             yo: 'hi'
                                                           , wrong: false
                                                           , deep : { prop: 12, prop2: 'hi' }
@@ -785,20 +779,20 @@ describe ( 'Finite State Machine', () => {
                                             // Use setTimeout to keep task unresolved for a while.
                                             const { dtbox } = dependencies;
                                             setTimeout ( () => {
-                                                            const deep = { 
+                                                            const deep = {
                                                                             prop: 'aloha'
-                                                                          , prop2: ['startUpdate', 'something', 'more'] 
+                                                                          , prop2 : ['startUpdate', 'something', 'more']
                                                                     };
-                                                            task.done ({ 
-                                                                          success   : true 
+                                                            task.done ({
+                                                                          success   : true
                                                                         , stateData : dtbox.init({ deep, yo:'hello' }).export() // Checkout dt-model input
                                                                         , response : { 'started': true }
                                                                     })
                                                     }, 200 )
                                           } // startUp func.
                                     , fireUp ({ task, dependencies }) {
-                                                const { dtbox } = dependencies;                                      
-                                                task.done ({ 
+                                                const { dtbox } = dependencies;
+                                                task.done ({
                                                               success : true
                                                             , stateData : dtbox.init ({ 'wrong' : true }) // Checkout dt-object input
                                                         })
@@ -807,26 +801,22 @@ describe ( 'Finite State Machine', () => {
                             ;
 
                       const fsm = new Fsm ( machine, transitions );
-                      fsm.update ( 'start' )
-                         .then ( x => {
-                                    expect ( x ).to.be.deep.equal ( { started: true } )
-                                    let startChanges = fsm.extractList ();
+                      const result1 = await fsm.update ( 'start' )
+                      expect ( result1 ).toEqual ( { started: true } )
+                      let startChanges = fsm.extractList ();
 
-                                    expect ( startChanges.yo ).to.be.equal ( 'hello' )
-                                    expect ( startChanges.wrong ).to.be.false
-                                    expect ( startChanges.deep.prop ).to.be.equal ( 'aloha' )
-                                    expect ( startChanges.deep.prop2 ).to.be.deep.equal ( ['startUpdate', 'something', 'more'] )
-                                    expect ( fsm.getState() ).to.be.equal ( 'initial' )
-                                    return fsm.update ( 'move' )
-                              })
-                        .then ( x => {
-                                    const moveChanges = fsm.extractList ();
-                                    expect ( moveChanges.yo ).to.be.equal ( 'hello' )
-                                    expect ( moveChanges.wrong ).to.be.true
-                                    expect ( moveChanges.deep.prop ).to.be.equal ( 'aloha' )
-                                    expect ( moveChanges.deep.prop2 ).to.be.deep.equal ( ['startUpdate', 'something', 'more'] )
-                                    done ()
-                              })
+                      expect ( startChanges.yo ).toBe ( 'hello' )
+                      expect ( startChanges.wrong ).toBe ( false )
+                      expect ( startChanges.deep.prop ).toBe ( 'aloha' )
+                      expect ( startChanges.deep.prop2 ).toEqual ( ['startUpdate', 'something', 'more'] )
+                      expect ( fsm.getState() ).toBe ( 'initial' )
+
+                      const result2 = await fsm.update ( 'move' )
+                      const moveChanges = fsm.extractList ();
+                      expect ( moveChanges.yo ).toBe ( 'hello' )
+                      expect ( moveChanges.wrong ).toBe ( true )
+                      expect ( moveChanges.deep.prop ).toBe ( 'aloha' )
+                      expect ( moveChanges.deep.prop2 ).toEqual ( ['startUpdate', 'something', 'more'] )
 
               }) // it Change stateData as dt-model and dt-object
 
@@ -834,13 +824,14 @@ describe ( 'Finite State Machine', () => {
 
 
 
-      it ( 'ExtractList with options', done => {  
+
+      it ( 'ExtractList with options', async () => {
                       const machine = {
                                               init  : 'none'
                                             , behavior : [
                                                               [ 'none', 'start', 'initial', 'startUp' ]
                                                         ]
-                                            , stateData : { 
+                                            , stateData : {
                                                             yo: 'hi'
                                                           , wrong: false
                                                           , deep : { prop: 12, prop2: 'hi', inside: { well: true } }
@@ -850,17 +841,18 @@ describe ( 'Finite State Machine', () => {
                                        startUp ({ task, extractList }) {
                                                 // Use setTimeout to keep task unresolved for a while.
                                                 const [ working, deepObject, say ] = extractList([ 'wrong', 'deep', 'yo'], {as: 'tuples'});
-                                                expect ( working ).to.be.false   // Primitive values are extracted directly
-                                                expect ( deepObject ).to.be.deep.equal ( [ [ 'prop', 12 ], [ 'prop2', 'hi' ], ['inside/well', true ] ] )   // ExtractList options are used 
-                                                expect ( say ).to.be.equal ( 'hi' ) 
+                                                expect ( working ).toBe ( false )   // Primitive values are extracted directly
+                                                expect ( deepObject ).toEqual ( [ [ 'prop', 12 ], [ 'prop2', 'hi' ], ['inside/well', true ] ] )   // ExtractList options are used
+                                                expect ( say ).toBe ( 'hi' )
                                                 task.done ({ success   : true })
-                                                done ()
                                           } // startUp func.
                                 }
                             ;
                       const fsm = new Fsm ( machine, transitions );
-                      fsm.update ( 'start' )
+                      await fsm.update ( 'start' )
           }) // it ExtractList as dt-object
+
+
 
 
 
@@ -915,7 +907,7 @@ describe ( 'Finite State Machine', () => {
                 // alt row was malformed. Before the fix it was created
                 // with value [null, 'useGenerator'].
                 expect ( fsm_chainActions_of ( fsm, 'none/activate' ) )
-                    .to.equal ( undefined )
+                    .toBe ( undefined )
         }) // it BUG 1 — null
 
         it ( 'rejects alt with [123, "actionName"] (BUG 1)', () => {
@@ -930,7 +922,7 @@ describe ( 'Finite State Machine', () => {
                                 switchON ({task}) { task.done ({ success : true }) }
                             ,   altOn    ({task}) { task.done ({ success : true }) }
                         });
-                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).toBe ( undefined )
         }) // it BUG 1 — number
 
         it ( 'rejects alt with [{}, "actionName"] (BUG 1)', () => {
@@ -945,7 +937,7 @@ describe ( 'Finite State Machine', () => {
                                 switchON ({task}) { task.done ({ success : true }) }
                             ,   altOn    ({task}) { task.done ({ success : true }) }
                         });
-                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).toBe ( undefined )
         }) // it BUG 1 — object
 
         it ( 'rejects alt with [true, "actionName"] (BUG 1)', () => {
@@ -961,7 +953,7 @@ describe ( 'Finite State Machine', () => {
                                 switchON ({task}) { task.done ({ success : true }) }
                             ,   altOn    ({task}) { task.done ({ success : true }) }
                         });
-                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).toBe ( undefined )
         }) // it BUG 1 — true
 
         it ( 'rejects alt that is not an array (BUG 1)', () => {
@@ -976,7 +968,7 @@ describe ( 'Finite State Machine', () => {
                                 switchON ({task}) { task.done ({ success : true }) }
                             ,   altOn    ({task}) { task.done ({ success : true }) }
                         });
-                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).toBe ( undefined )
         }) // it BUG 1 — non-array alt
 
         it ( 'rejects alt that is the wrong length (BUG 1)', () => {
@@ -991,7 +983,7 @@ describe ( 'Finite State Machine', () => {
                                 switchON ({task}) { task.done ({ success : true }) }
                             ,   altOn    ({task}) { task.done ({ success : true }) }
                         });
-                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).to.equal ( undefined )
+                expect ( fsm_chainActions_of ( fsm, 'none/activate' ) ).toBe ( undefined )
         }) // it BUG 1 — wrong length
 
         it ( 'accepts valid alt [false, "actionName"] (BUG 1 — positive case)', () => {
@@ -1009,9 +1001,9 @@ describe ( 'Finite State Machine', () => {
                 // Valid alt is registered. [0] is `false` (no positive
                 // chain), [1] is the action name for the negative chain.
                 const entry = fsm_chainActions_of ( fsm, 'none/activate' )
-                expect ( entry ).to.be.an ( 'array' )
-                expect ( entry[0] ).to.equal ( false )
-                expect ( entry[1] ).to.equal ( 'useGenerator' )
+                expect ( Array.isArray ( entry ) ).toBe ( true )
+                expect ( entry[0] ).toBe ( false )
+                expect ( entry[1] ).toBe ( 'useGenerator' )
         }) // it BUG 1 — valid
 
         it ( 'accepts valid alt ["actionA", "actionB"] (BUG 1 — both branches)', () => {
@@ -1029,8 +1021,8 @@ describe ( 'Finite State Machine', () => {
                             ,   onB      ({task}) { task.done ({ success : true }) }
                         });
                 const entry = fsm_chainActions_of ( fsm, 'none/activate' )
-                expect ( entry[0] ).to.equal ( 'chainA' )
-                expect ( entry[1] ).to.equal ( 'chainB' )
+                expect ( entry[0] ).toBe ( 'chainA' )
+                expect ( entry[1] ).toBe ( 'chainB' )
         }) // it BUG 1 — both branches
 
         // -----------------------------------------------------------------
@@ -1049,7 +1041,7 @@ describe ( 'Finite State Machine', () => {
         // The fix checks `typeof updateObject.export === 'function'`,
         // which only matches a real dt-object.
         // -----------------------------------------------------------------
-        it ( 'accepts an updateObject with a truthy non-function "export" property (BUG 2)', done => {
+        it ( 'accepts an updateObject with a truthy non-function "export" property (BUG 2)', async () => {
                 // A common case: the user happens to have a top-level
                 // property called `export` on the patch (e.g. exporting a
                 // file, an "export" flag in the data). The library must
@@ -1076,21 +1068,19 @@ describe ( 'Finite State Machine', () => {
                             }
                     ;
                 const fsm = new Fsm ( machine, lib );
-                fsm.update ( 'activate' )
-                   .then ( () => {
-                                // The update succeeded and the existing
-                                // field is updated. Before the fix, this
-                                // would have thrown inside `_updateStateData`
-                                // ("updateObject.query is not a function")
-                                // and the state would never have been
-                                // touched.
-                                const r = fsm.extractList (['existing']);
-                                expect ( r[0] ).to.equal ( 'after' )
-                                done ()
-                        }, done )
+                await fsm.update ( 'activate' )
+
+                // The update succeeded and the existing
+                // field is updated. Before the fix, this
+                // would have thrown inside `_updateStateData`
+                // ("updateObject.query is not a function")
+                // and the state would never have been
+                // touched.
+                const r = fsm.extractList (['existing']);
+                expect ( r[0] ).toBe ( 'after' )
         }) // it BUG 2 — truthy non-function export
 
-        it ( 'still detects a real dt-object (BUG 2 — positive case)', done => {
+        it ( 'still detects a real dt-object (BUG 2 — positive case)', async () => {
                 // A real dt-object exposes `.export()` and `.query()`.
                 // Make sure the type detection still works after the fix.
                 const
@@ -1113,12 +1103,10 @@ describe ( 'Finite State Machine', () => {
                             }
                     ;
                 const fsm = new Fsm ( machine, lib );
-                fsm.update ( 'activate' )
-                   .then ( () => {
-                                const r = fsm.extractList (['existing']);
-                                expect ( r[0] ).to.equal ( 'from-dt-object' )
-                                done ()
-                        }, done )
+                await fsm.update ( 'activate' )
+
+                const r = fsm.extractList (['existing']);
+                expect ( r[0] ).toBe ( 'from-dt-object' )
         }) // it BUG 2 — real dt-object
 
     }) // describe Bug regressions
@@ -1138,5 +1126,3 @@ function fsm_chainActions_of ( fsm, key ) {
         // `debugFSM`. We just look it up.
         return globalThis.debugFSM.chainActions[key]
 }
-
-
