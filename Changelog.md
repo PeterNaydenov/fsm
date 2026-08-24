@@ -1,6 +1,12 @@
 ## Release History
 
 
+### 5.2.8 ( 2026-08-24)
+- [x] Dependency update: dt-toolbox@7.4.9;
+- [x] Dependency update: dt-queries@1.1.5;
+
+
+
 ### 5.2.7 ( 2026-07-22)
 - [x] Fix: `_isAltValid` accepted any 2-element array (broken `forEach` — return value was ignored). Now rejects anything outside `[string, false]` before the chain action is registered;
 - [x] Fix: `_updateStateData` (and `queryStateUpdate.js`) treated any object with a truthy `export` key as a dt-object, breaking patches like `{ export: 'csv-format', existing: 'after' }`. Now checks `typeof export === 'function'` — same fix applied to both files;
