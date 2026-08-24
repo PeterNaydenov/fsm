@@ -22,7 +22,7 @@
     "build": "rollup -c"
   },
   "dependencies": {
-    "@peter.naydenov/dt-queries": "^1.1.4",
+    "@peter.naydenov/dt-queries": "^1.1.5",
     "ask-for-promise": "^3.2.0",
     "dt-toolbox": "^7.4.9"
   },
