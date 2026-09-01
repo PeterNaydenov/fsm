@@ -1,6 +1,12 @@
 ## Release History
 
 
+
+### 5.2.9 ( 2026-09-01)
+- [x] Dependency update: dt-toolbox@7.5.0;
+
+
+
 ### 5.2.8 ( 2026-08-24)
 - [x] Dependency update: dt-toolbox@7.4.9;
 - [x] Dependency update: dt-queries@1.1.5;
