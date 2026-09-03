@@ -2,6 +2,11 @@
 
 
 
+### 5.2.10 ( 2026-09-03)
+- [x] Dependency update: dt-queries@1.1.6;
+
+
+
 ### 5.2.9 ( 2026-09-01)
 - [x] Dependency update: dt-toolbox@7.5.0;
 
