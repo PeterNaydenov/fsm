@@ -30,7 +30,7 @@ import methods from './methods/index.js'
 
 /**
  * A dt-toolbox model row: name, flat data, breadcrumbs, and parent/child links.
- * @typedef {[string, Object<string, *>|Array<*>, string, Array<[string, string]>]} DtLine
+ * @typedef {[string, Record<string, *>|Array<*>, string, Array<[string, string]>]} DtLine
  */
 
 /**
@@ -41,15 +41,15 @@ import methods from './methods/index.js'
 /**
  * The portion of the dt-toolbox object API used by this library.
  * @typedef {Object} DtObject
- * @property {function(Function, ...*): DtObject} query - Apply a query to the model.
- * @property {function(string=): DtModel} export - Export the whole model or a segment.
- * @property {function(Function, ...*): *} model - Convert selected data to a format.
- * @property {function(Array<string>, StateDataFormat=): Array<*>} extractList - Extract values.
+ * @property {(fn: Function, ...args: any[]) => DtObject} query - Apply a query to the model.
+ * @property {(segment?: string) => DtModel} export - Export the whole model or a segment.
+ * @property {(fn: Function, ...args: any[]) => any} model - Convert selected data to a format.
+ * @property {(segments: Array<string>, options?: StateDataFormat) => Array<any>} extractList - Extract values.
  */
 
 /**
  * A patch for existing state-data fields. New top-level fields are ignored.
- * @typedef {Object<string, *>|DtModel|DtObject} StateDataUpdate
+ * @typedef {Record<string, *>|DtModel|DtObject} StateDataUpdate
  */
 
 /**
@@ -57,20 +57,41 @@ import methods from './methods/index.js'
  * @typedef {Object} FsmDefinition
  * @property {string} [init='N/A'] - Initial state; falsy values fall back to 'N/A'.
  * @property {Array<BehaviorRow>} behavior - State/action rules; an empty table is valid.
- * @property {Object<string, *>} [stateData={}] - Initial state-data fields and segments.
+ * @property {Record<string, *>} [stateData={}] - Initial state-data fields and segments.
  * @property {boolean} [debug=false] - Log missing transitions and expose the internal
  * machine as `global.debugFSM` in environments that provide `global`.
  * @property {StateDataFormat} [stateDataFormat={as:'std'}] - Default extraction format.
  */
 
 /**
- * Built-in dependencies plus any values supplied through `setDependencies()`.
- * @typedef {Object<string, *>} Dependencies
- * @property {typeof walk} walk - dt-toolbox's tree walker.
- * @property {typeof dtbox} dtbox - Data-model utilities.
+ * Overloaded state-data reader: a request list returns a list, while a call
+ * without arguments returns the complete standard object.
+ * @typedef {((requestedSegments: Array<string>, options?: StateDataFormat|false) => Array<*>) & (() => Record<string, *>)} ExtractList
+ */
+
+/**
+ * The portion of the dt-toolbox factory API used by this library.
+ * @typedef {Object} DtToolbox
+ * @property {(data: any, options?: {model?: string}) => (DtObject|null)} init - Initialize data.
+ * @property {(data: DtModel) => DtObject} load - Load an exported model.
+ * @property {Function} flat - Convert data to a model.
+ * @property {Function} convert - Convert data between supported formats.
+ * @property {() => Function} getWalk - Get the tree walker.
+ */
+
+/**
+ * Built-in dependencies available to transitions.
+ * @typedef {Object} BuiltinDependencies
+ * @property {Function} walk - dt-toolbox's tree walker.
+ * @property {DtToolbox} dtbox - Data-model utilities.
  * @property {typeof askForPromise} askForPromise - Promise-task factory.
- * @property {{splitSegments: typeof splitSegments, joinSegments: typeof joinSegments,
- * updateState: typeof updateState}} query - State-data queries.
+ * @property {{splitSegments: Function, joinSegments: Function,
+ * updateState: Function}} query - State-data queries.
+ */
+
+/**
+ * Built-in dependencies plus any values supplied through `setDependencies()`.
+ * @typedef {BuiltinDependencies & Record<string, *>} Dependencies
  */
 
 /**
@@ -93,7 +114,7 @@ import methods from './methods/index.js'
  * @property {Task} task - Complete with `task.done(result)`; returning a value
  * or a promise from the transition does not complete the task.
  * @property {string} state - State before the transition.
- * @property {ReturnType<typeof import('./methods/extractList.js').default>} extractList - Read state data.
+ * @property {ExtractList} extractList - Read state data.
  * @property {Dependencies} dependencies - Current built-in and injected dependencies.
  */
 
@@ -105,7 +126,7 @@ import methods from './methods/index.js'
  * @returns {*} The return value is ignored; complete `system.task` instead.
  */
 
-/** @typedef {Object<string, Transition>} TransitionLibrary */
+/** @typedef {Record<string, Transition>} TransitionLibrary */
 
 /**
  * 'positive' and 'negative' fire for the corresponding outcome of each step;
@@ -145,11 +166,16 @@ import methods from './methods/index.js'
  */
 
 /**
+ * Constructible public entry point, including its static built-in dependencies.
+ * @typedef {{new(definition: FsmDefinition, lib?: TransitionLibrary): FsmApi, dependencies: Dependencies}} FsmConstructor
+ */
+
+/**
  * Lookup tables keyed by `${state}/${action}`.
  * @typedef {Object} TransitionTables
- * @property {Object<string, Transition|null>} transitions - Functions or null for missing functions.
- * @property {Object<string, string>} nextState - State to enter after success.
- * @property {Object<string, ChainActions>} chainActions - Valid chaining pairs.
+ * @property {Record<string, Transition|null>} transitions - Functions or null for missing functions.
+ * @property {Record<string, string>} nextState - State to enter after success.
+ * @property {Record<string, ChainActions>} chainActions - Valid chaining pairs.
  */
 
 /**
@@ -171,11 +197,11 @@ import methods from './methods/index.js'
  * @property {boolean} lock - Whether an update is being processed.
  * @property {Array<CachedUpdate>} cache - Pending updates in arrival order.
  * @property {Dependencies} dependencies - Current dependencies.
- * @property {Object<EventName, Array<EventCallback>>} callback - Event-handler lists.
+ * @property {Record<EventName, Array<EventCallback>>} callback - Event-handler lists.
  * @property {FsmApi} api - Bound public methods.
- * @property {Object<string, Transition|null>} transitions - Bound transition table.
- * @property {Object<string, string>} nextState - Destination-state table.
- * @property {Object<string, ChainActions>} chainActions - Chaining table.
+ * @property {Record<string, Transition|null>} transitions - Bound transition table.
+ * @property {Record<string, string>} nextState - Destination-state table.
+ * @property {Record<string, ChainActions>} chainActions - Chaining table.
  * @property {ReturnType<typeof import('./methods/_setTransitions.js').default>} _setTransitions - Build lookup tables.
  * @property {ReturnType<typeof import('./methods/_updateStateData.js').default>} _updateStateData - Patch stored data.
  * @property {ReturnType<typeof import('./methods/_updateStep.js').default>} _updateStep - Process one transition step.
@@ -275,6 +301,6 @@ Fsm.dependencies = {
 
 
 
-export default Fsm
+export default /** @type {FsmConstructor} */ (Fsm)
 
 

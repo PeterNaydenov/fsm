@@ -2,7 +2,7 @@
  * Bind end-of-update notifications and queue release to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(*=): void} Bound completion handler.
+ * @returns {(data?: any) => void} Bound completion handler.
  */
 function _onUpdateTask ( fsm ) {
 /**

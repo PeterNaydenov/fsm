@@ -2,13 +2,13 @@
  * Create the debug warning logger. The captured machine is currently unused.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(Object<string, (import('../main.js').Transition|null)>): void} Bound logger.
+ * @returns {(transitions: Record<string, import('../main.js').Transition|null>) => void} Bound logger.
  */
 function _warn ( fsm ) {
 /**
  * Log a warning for each transition-library name that could not be resolved.
  * @private
- * @param {Object<string, (import('../main.js').Transition|null)>} transitions - Transition lookup table.
+ * @param {Record<string, (import('../main.js').Transition|null)>} transitions - Transition lookup table.
  * @returns {void}
  */
 return function ( transitions ) {

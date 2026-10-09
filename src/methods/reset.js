@@ -2,7 +2,7 @@
 /**
  * Bind restoration of initial values to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(): void} Bound reset method.
+ * @returns {() => void} Bound reset method.
  */
 function reset ( fsm ) {
 /**

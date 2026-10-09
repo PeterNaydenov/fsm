@@ -2,7 +2,7 @@
  * Bind transition-result processing to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(import('../main.js').Task, string, *=): void} Bound step processor.
+ * @returns {(updateTask: import('../main.js').Task, action: string, data?: any) => void} Bound step processor.
  */
 function _updateStep ( fsm ) {
 /**

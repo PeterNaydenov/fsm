@@ -1,7 +1,7 @@
 /**
  * Bind dependency inspection to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(): import('../main.js').Dependencies} Bound dependency getter.
+ * @returns {() => import('../main.js').Dependencies} Bound dependency getter.
  */
 function getDependencies (fsm) {
 /**

@@ -2,7 +2,7 @@
  * Bind chaining-table lookup to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(string): (import('../main.js').ChainActions|false)} Bound lookup.
+ * @returns {(key: string) => (import('../main.js').ChainActions|false)} Bound lookup.
  */
 function _getChain ( fsm ) {
 /**

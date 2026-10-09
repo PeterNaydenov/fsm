@@ -1,7 +1,7 @@
 /**
  * Bind action updates to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(string, *=): Promise<*>} Bound update method.
+ * @returns {(action: string, data?: any) => Promise<any>} Bound update method.
  */
 function update ( fsm ) {
 /**

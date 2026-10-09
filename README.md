@@ -84,6 +84,12 @@ import Fsm from '@peter.naydenov/fsm'
 ```
 ... where **machine** is fsm-description and **lib** is a transition-library.
 
+TypeScript declarations are generated from the source JSDoc and included in
+`dist/types`. TypeScript resolves them through the package entry point.
+Run `npm run build:types` to generate declarations only, or `npm run build`
+to generate declarations and JavaScript bundles. Run `npm run test:types`
+to check the declarations with TypeScript consumers.
+
 If your project is commonJS, use a dynamic `import` function or use version v.3.0.0 or older.
 
 

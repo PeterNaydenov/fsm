@@ -1,7 +1,7 @@
 /**
  * Bind event registration to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(import('../main.js').EventName, import('../main.js').EventCallback): void} Bound registration method.
+ * @returns {(event: import('../main.js').EventName, callback: import('../main.js').EventCallback) => void} Bound registration method.
  */
 function on ( fsm ) {
 /**

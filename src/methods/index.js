@@ -26,7 +26,7 @@ import extractList        from './extractList.js'
  * Method factories bound during construction. Names beginning with '_' are
  * attached to internal storage; the remaining methods form the returned API.
  * @private
- * @type {Object<string, Function>}
+ * @type {Record<string, Function>}
  */
 const fn = {
 // *** "Private" methods

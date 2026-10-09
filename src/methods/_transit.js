@@ -2,7 +2,7 @@
  * Bind transition dispatch to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(import('../main.js').Task, string, ...*): void} Bound dispatcher.
+ * @returns {(task: import('../main.js').Task, key: string, ...args: any[]) => void} Bound dispatcher.
  */
 function _transit (fsm ) {
 /**

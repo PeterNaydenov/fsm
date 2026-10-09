@@ -5,9 +5,11 @@
   "license": "MIT",
   "author": "Peter Naydenov",
   "main": "./dist/fsm.umd.js",
+  "types": "./dist/types/main.d.ts",
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/types/main.d.ts",
       "import": "./dist/fsm.esm.mjs",
       "require": "./dist/fsm.cjs",
       "default": "./dist/fsm.umd.js"
@@ -19,7 +21,9 @@
   "scripts": {
     "test": "vitest run",
     "cover": "vitest run --coverage",
-    "build": "rollup -c"
+    "build:types": "tsc -p tsconfig.json",
+    "test:types": "npm run build:types && tsc -p test/types/tsconfig.json",
+    "build": "npm run build:types && rollup -c"
   },
   "dependencies": {
     "@peter.naydenov/dt-queries": "^1.1.6",
@@ -32,6 +36,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "@vitest/coverage-v8": "^5.0.3",
     "rollup": "^4.64.3",
+    "typescript": "^7.0.2",
     "vitest": "^5.0.3"
   },
   "overrides": {

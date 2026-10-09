@@ -4,7 +4,7 @@
  * Bind state-data patching to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(import('../main.js').StateDataUpdate): import('../main.js').DtObject} Bound patcher.
+ * @returns {(update: import('../main.js').StateDataUpdate) => import('../main.js').DtObject} Bound patcher.
  */
 function _updateStateData ( fsm ) {
 /**

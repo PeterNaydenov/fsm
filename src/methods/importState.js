@@ -1,7 +1,7 @@
 /**
  * Bind snapshot import to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(import('../main.js').ExternalState): void} Bound import method.
+ * @returns {(snapshot: import('../main.js').ExternalState) => void} Bound import method.
  */
 function importState (fsm) {
 /**

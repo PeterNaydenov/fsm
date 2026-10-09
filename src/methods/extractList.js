@@ -3,7 +3,7 @@
 /**
  * Bind state-data extraction to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(Array<string>=, (import('../main.js').StateDataFormat|false)=): (Array<*>|Object<string, *>)} Bound extractor.
+ * @returns {import('../main.js').ExtractList} Bound extractor.
  */
 function extractList ( fsm ) {
 /**
@@ -16,7 +16,7 @@ function extractList ( fsm ) {
  * the argument entirely to read all data; an empty list returns an empty list.
  * @param {import('../main.js').StateDataFormat|false} [options=false] - Extraction
  * format options; `false` uses the machine's configured default.
- * @returns {Array<*>|Object<string, *>} Requested values, or all data when called without arguments.
+ * @returns {Array<*>|Record<string, *>} Requested values, or all data when called without arguments.
  * @throws {Error} If dt-toolbox receives invalid format options.
  * @example
  * const [count, settings] = machine.extractList(['count', 'settings'], {as: 'std'});

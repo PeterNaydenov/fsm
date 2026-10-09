@@ -4,7 +4,7 @@
  * Bind queue draining to a machine.
  * @private
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(): void} Bound queue runner.
+ * @returns {() => void} Bound queue runner.
  */
 function _triggerCacheUpdate ( fsm ) {
 /**

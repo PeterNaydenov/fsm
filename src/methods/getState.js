@@ -1,7 +1,7 @@
 /**
  * Bind state inspection to a machine.
  * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
- * @returns {function(): string} Bound state getter.
+ * @returns {() => string} Bound state getter.
  */
 function getState ( fsm ) {
 /**
