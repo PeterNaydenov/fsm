@@ -1,6 +1,15 @@
 ## Release History
 
 
+
+### 5.3.0 ( 2026-10-09)
+- [x] Rewrite a jsdoc comments;
+- [x] Install a typescript for building a d.ts files;
+- [x] Update the package.json to export the types;
+- [x] Skill was created;
+
+
+
 ### 5.2.11 ( 2026-09-26)
 - [x] Dependency update: dt-toolbox@7.5.1;
 
