@@ -1,4 +1,17 @@
+/**
+ * Create the behavior-table compiler. This factory does not need machine storage.
+ * @private
+ * @returns {function(Array<import('../main.js').BehaviorRow>, import('../main.js').TransitionLibrary): import('../main.js').TransitionTables} Bound compiler.
+ */
 function _setTransitions () {
+/**
+ * Compile state/action rows into transition, destination-state, and chaining tables.
+ * Unresolved library names become null; malformed chaining pairs are ignored.
+ * @private
+ * @param {Array<import('../main.js').BehaviorRow>} behavior - Machine behavior table.
+ * @param {import('../main.js').TransitionLibrary} lib - Transition functions by name.
+ * @returns {import('../main.js').TransitionTables} Lookup tables for update processing.
+ */
 return function ( behavior, lib ) {   // ( machineTable, transitionLib ) --> {transitions, nextState, chainActions}
      // *** Converts initial FSM data to useful fsm objects.
                 let 
@@ -27,6 +40,12 @@ return function ( behavior, lib ) {   // ( machineTable, transitionLib ) --> {tr
 
 
 
+/**
+ * Validate a two-element positive/negative chaining pair.
+ * @private
+ * @param {*} alt - Candidate chaining configuration.
+ * @returns {boolean} Whether both entries are strings or the literal false.
+ */
 function _isAltValid ( alt ) {   //   (altAction) -> boolean
 // *** Check if alt is valid altAction.
 // *** An altAction must be a 2-element array of [positive, negative] chain

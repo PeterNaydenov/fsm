@@ -1,11 +1,26 @@
 'use strict'
 
+/**
+ * Bind state-data extraction to a machine.
+ * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
+ * @returns {function(Array<string>=, (import('../main.js').StateDataFormat|false)=): (Array<*>|Object<string, *>)} Bound extractor.
+ */
 function extractList ( fsm ) {
 /**
- *  Returns a list of requested segments from the state data.
- *  @param {array.<string>} requestedSegments       - The list of requested segments.
- *  @param {string|boolean} [options=false]         - The model option for the query.
- *  @returns {array.<[object,dt-object,string,number,null]>}  - The list of requested segments.
+ * Extract segments or properties in request order, with `null` for missing values.
+ * With no arguments, return all joined data as a standard JavaScript object.
+ * With a list, model object segments using the supplied format or the machine's
+ * `stateDataFormat`; primitive values are returned directly.
+ *
+ * @param {Array<string>} [requestedSegments] - Segment or property names. Omit
+ * the argument entirely to read all data; an empty list returns an empty list.
+ * @param {import('../main.js').StateDataFormat|false} [options=false] - Extraction
+ * format options; `false` uses the machine's configured default.
+ * @returns {Array<*>|Object<string, *>} Requested values, or all data when called without arguments.
+ * @throws {Error} If dt-toolbox receives invalid format options.
+ * @example
+ * const [count, settings] = machine.extractList(['count', 'settings'], {as: 'std'});
+ * const allData = machine.extractList();
  */
 return function extractList ( requestedSegments, options=false ) {
 // *** Returns a list of requested segments

@@ -1,10 +1,21 @@
+/**
+ * Bind action updates to a machine.
+ * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
+ * @returns {function(string, *=): Promise<*>} Bound update method.
+ */
 function update ( fsm ) {
 /**
- * @method update
- * @description Executes transition-functions or sets transition steps into a cache queue
- * @param {string} action - action name.
- * @param {any} dt - any upcoming data.
- * @returns {Promise} - Promise<transitionResponse>
+ * Execute an action and any resulting chain, or queue it while an update is active.
+ * Queued actions are evaluated against the state when they begin executing.
+ * Unknown state/action pairs and missing functions produce unsuccessful steps;
+ * without a chain their promises resolve with `undefined`.
+ *
+ * @param {string} action - Action name from the behavior table.
+ * @param {*} [dt] - Input passed to the first transition.
+ * @returns {Promise<*>} Final transition's response. Rejects if the queued update
+ * is canceled by `ignoreCachedUpdates()`.
+ * @example
+ * const response = await machine.update('start', {source: 'button'});
  */
 return function update ( action, dt ) {   //   () -> Promise<transitionResponse>
 // *** Executes transition-functions and transition-chains.

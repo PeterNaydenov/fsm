@@ -22,6 +22,12 @@ import extractList        from './extractList.js'
 
 
 
+/**
+ * Method factories bound during construction. Names beginning with '_' are
+ * attached to internal storage; the remaining methods form the returned API.
+ * @private
+ * @type {Object<string, Function>}
+ */
 const fn = {
 // *** "Private" methods
               _setTransitions     // Convert machine configuration and transition library in a internal fsm structures

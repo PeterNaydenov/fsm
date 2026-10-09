@@ -1,4 +1,21 @@
+/**
+ * Bind transition-result processing to a machine.
+ * @private
+ * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
+ * @returns {function(import('../main.js').Task, string, *=): void} Bound step processor.
+ */
 function _updateStep ( fsm ) {
+/**
+ * Lock the machine, dispatch one step, apply successful state/data changes, and
+ * notify outcome and transition handlers. Run the selected chain action with
+ * the step's response, or complete the parent update task when the chain ends.
+ * Step-task rejection is logged; it does not complete the parent update task.
+ * @private
+ * @param {import('../main.js').Task} updateTask - Parent task for the entire update chain.
+ * @param {string} action - Action evaluated against the current state.
+ * @param {*} [data] - Input passed to this transition.
+ * @returns {void}
+ */
 return function ( updateTask, action, data ) {
     const 
           { askForPromise } = fsm.dependencies
@@ -11,15 +28,6 @@ return function ( updateTask, action, data ) {
     fsm._transit ( task, key, data )
     task.onComplete (
             result => {
-                    /**
-                     *    Result description:
-                     *  {
-                     *       success   - boolean. Is it transition successful.
-                     *     ? stateData - object. Flat object with fsm state values.
-                     *     ? response  - object. External data as response of transition if needed.
-                     *  }
-                     */
-
                     let 
                           chainActions = fsm._getChain ( key )
                         , data = result.response

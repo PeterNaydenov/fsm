@@ -1,10 +1,19 @@
 'use strict'
 
+/**
+ * Bind state-data patching to a machine.
+ * @private
+ * @param {import('../main.js').FsmContext} fsm - Internal machine storage.
+ * @returns {function(import('../main.js').StateDataUpdate): import('../main.js').DtObject} Bound patcher.
+ */
 function _updateStateData ( fsm ) {
 /**
- * Updates the state data.
- * @param {object} updateObject - The update object.
- * @returns {dt-object}         - The updated state data.
+ * Normalize a plain object, dt-model, or dt-object to segments and update existing
+ * state-data fields. A non-model array logs an error and leaves data unchanged.
+ * @private
+ * @param {import('../main.js').StateDataUpdate} updateObject - Patch of existing fields.
+ * @returns {import('../main.js').DtObject} Updated segmented data, or the current data
+ * when an unsupported array is rejected.
  */
 return function _updateStateData ( updateObject ) {
     
