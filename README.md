@@ -94,6 +94,14 @@ If your project is commonJS, use a dynamic `import` function or use version v.3.
 
 
 
+## Agent skill
+
+A portable `fsm` skill is available in [skills/fsm/SKILL.md](skills/fsm/SKILL.md).
+It includes API guidance and runnable examples for agents working with this library.
+Copy the entire `skills/fsm` folder into your agent's supported skills location,
+or load its `SKILL.md` directly. Discovery depends on the agent; the shared bundle
+uses the standard Agent Skills format without agent-specific configuration.
+
 ## Fsm Description
 Fsm description is an object that define fsm business logic. Every fsm description should contain **init** and **behavior** properties.:
 ```js
