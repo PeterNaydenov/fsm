@@ -2,6 +2,20 @@
 
 
 
+### 6.0.0 ( 2026-10-17)
+- [x] Breaking: Dependency update: dt-toolbox@8.1.3. The built-in `walk` dependency is now `@peter.naydenov/walk` v7: in walk callbacks, `return IGNORE` must become `return IGNORE()`. See `Migration.guide.md`;
+- [x] Breaking: `exportState()` keeps Date and RegExp values as plain values in the model. Before, they were `{ __dtSentinel__ }` objects. A snapshot passed in memory restores them as before, but a snapshot sent through `JSON.stringify` now comes back with a date string and an empty object for a RegExp. Snapshots exported by 5.x still import correctly;
+- [x] Breaking: CommonJS types. `require` now resolves to `dist/types/main.d.cts` with `export =`, which matches `module.exports = Fsm` in `dist/fsm.cjs`. Named types are on the namespace: `Fsm.FsmDefinition`. Before, CommonJS consumers got the ESM types, so `require(...).default` passed the type check but was `undefined` at runtime. Checked with `@arethetypeswrong/cli`: node10, node16 (CJS and ESM) and bundler pass;
+- [x] Fix: `debug: true` threw "global is not defined" in browsers. The machine is now exposed as `globalThis.debugFSM`;
+- [x] Fix: State-data keys with RegExp special characters (e.g. `'a(b'`) no longer throw. Fixed by dt-toolbox 8;
+- [x] Performance: dt-toolbox 8 makes the machine faster: constructor ~1.9x, `update` ~1.4x, `extractList` ~1.8-2.7x, `exportState`/`importState` ~1.9x, `reset` ~4.6x. Each machine keeps about half the memory (200-item state data: 765 KB → 377 KB);
+- [x] Dependency update: dt-queries@1.1.8;
+- [x] Package: A `files` list in `package.json` replaces `.npmignore`. The coverage report, `rollup.config.js`, `blueprint.md` and `README_v.4.x.x.md` are no longer published (tarball 79 KB → 39 KB);
+- [x] Package: `prepublishOnly` runs the tests and the type tests, then builds the bundles;
+- [x] Tests: Regression tests for debug mode without `global` and for keys with special characters. 29 → 31 tests. The CommonJS type test also covers `import Fsm = require(...)`;
+
+
+
 ### 5.3.0 ( 2026-10-09)
 - [x] Rewrite a jsdoc comments;
 - [x] Install a typescript for building a d.ts files;
