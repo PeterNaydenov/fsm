@@ -1109,6 +1109,36 @@ describe ( 'Finite State Machine', () => {
                 expect ( r[0] ).toBe ( 'from-dt-object' )
         }) // it BUG 2 — real dt-object
 
+
+
+        it ( 'BUG 3 — debug mode works without a `global` variable (browsers)', () => {
+                // Before the fix, `debug: true` threw "ReferenceError: global is not defined" in browsers.
+                const descriptor = Object.getOwnPropertyDescriptor ( globalThis, 'global' );
+                delete globalThis.global
+                try {
+                        new Fsm ({ init: 'browser', behavior: [], debug: true })
+                        expect ( globalThis.debugFSM.state ).toBe ( 'browser' )
+                    }
+                finally {
+                        Object.defineProperty ( globalThis, 'global', descriptor )
+                    }
+        }) // it BUG 3
+
+
+
+        it ( 'BUG 4 — state-data keys with RegExp special characters', async () => {
+                // dt-toolbox 7 threw "Invalid regular expression" on keys like 'a(b'. Fixed in dt-toolbox 8.
+                const fsm = new Fsm ({
+                                  init : 'none'
+                                , behavior : [[ 'none', 'set', 'done', 'set' ]]
+                                , stateData : { 'a(b': 1, 'x+': { y: 2 } }
+                            }, {
+                                set ({ task }) { task.done ({ success: true, stateData: { 'a(b': 3 } }) }
+                            });
+                await fsm.update ( 'set' )
+                expect ( fsm.extractList () ).toEqual ({ 'a(b': 3, 'x+': { y: 2 } })
+        }) // it BUG 4
+
     }) // describe Bug regressions
 
 
