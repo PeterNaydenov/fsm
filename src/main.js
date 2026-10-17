@@ -59,7 +59,7 @@ import methods from './methods/index.js'
  * @property {Array<BehaviorRow>} behavior - State/action rules; an empty table is valid.
  * @property {Record<string, *>} [stateData={}] - Initial state-data fields and segments.
  * @property {boolean} [debug=false] - Log missing transitions and expose the internal
- * machine as `global.debugFSM` in environments that provide `global`.
+ * machine as `globalThis.debugFSM`.
  * @property {StateDataFormat} [stateDataFormat={as:'std'}] - Default extraction format.
  */
 
@@ -72,7 +72,7 @@ import methods from './methods/index.js'
 /**
  * The portion of the dt-toolbox factory API used by this library.
  * @typedef {Object} DtToolbox
- * @property {(data: any, options?: {model?: string}) => (DtObject|null)} init - Initialize data.
+ * @property {(data: any, options?: {model?: string}) => DtObject} init - Initialize data; throws on an unsupported model.
  * @property {(data: DtModel) => DtObject} load - Load an exported model.
  * @property {Function} flat - Convert data to a model.
  * @property {Function} convert - Convert data between supported formats.
@@ -276,7 +276,7 @@ function Fsm ({init, behavior, stateData={}, debug, stateDataFormat={as:'std'} }
             const {transitions, nextState, chainActions } = fsm._setTransitions ( behavior, lib );
             if ( debug ) {  
                         fsm._warn ( transitions )
-                        global.debugFSM = fsm
+                        globalThis.debugFSM = fsm
                 }
 
             fsm.transitions   = transitions
