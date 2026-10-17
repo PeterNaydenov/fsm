@@ -1,6 +1,48 @@
 ## Migration Guides
 
 
+## Migration from v.5.x.x to v.6.x.x.
+The machine API (definition, transitions, methods, events) is the same. Changes come from dt-toolbox 8 and the CommonJS types. Most projects upgrade without code changes.
+
+### Built-in `walk` dependency
+`dependencies.walk` and `Fsm.dependencies.walk` are now `@peter.naydenov/walk` v7. If a callback returns `IGNORE`, call it:
+
+```js
+// ver. 5 ->
+    walk ({ data, keyCallback ({ value, IGNORE }) { if ( value == null ) return IGNORE; return value } })
+// ver. 6 ->
+    walk ({ data, keyCallback ({ value, IGNORE }) { if ( value == null ) return IGNORE (); return value } })
+```
+
+### Built-in `dtbox` dependency
+`dependencies.dtbox` is dt-toolbox 8:
+- `dtbox.init ( data, { model } )` with an unknown model throws an error. Before, it returned `null`;
+- `dt.copy ()` returns keys in the same order as `model(() => ({as:'std'}))`: plain values first, then nested objects. Values are the same;
+- See the dt-toolbox [Changelog](https://github.com/PeterNaydenov/dt-toolbox/blob/master/Changelog.md) for the full list.
+
+### Snapshots with Date and RegExp values
+Snapshots from `exportState()` keep Date and RegExp values as they are. When you pass a snapshot in memory, `importState()` restores them as before. JSON can't keep these values: after `JSON.stringify`, a Date comes back as an ISO string and a RegExp as `{}`. If you store snapshots as JSON and need Date objects back, convert them after `JSON.parse`, or keep dates in state data as ISO strings. Snapshots exported by version 5 still import correctly.
+
+### CommonJS and TypeScript
+CommonJS types now use `export =`, the same as the runtime `module.exports = Fsm`:
+
+```ts
+// CommonJS (.cts, or "module": "commonjs")
+import Fsm = require ( '@peter.naydenov/fsm' )
+const definition: Fsm.FsmDefinition = { init: 'idle', behavior: [] }
+
+// with "esModuleInterop" (the default for "module": "nodenext"), a default import also works
+import Fsm from '@peter.naydenov/fsm'
+```
+- Remove any `require('@peter.naydenov/fsm').default`. It was `undefined` at runtime;
+- With `"moduleResolution": "node10"` and no `esModuleInterop`, use `import Fsm = require(...)`;
+- ES modules and bundlers keep `import Fsm, { type FsmDefinition } from '@peter.naydenov/fsm'`.
+
+### Debug mode
+`debug: true` sets `globalThis.debugFSM`. In Node.js, `global.debugFSM` is the same object. Debug mode now works in browsers too.
+
+
+
 ## Migration from v.4.x.x to v.5.x.x.
 
 ### FSM Description
