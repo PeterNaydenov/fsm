@@ -10,6 +10,7 @@
 - [x] Fix: State-data keys with RegExp special characters (e.g. `'a(b'`) no longer throw. Fixed by dt-toolbox 8;
 - [x] Performance: dt-toolbox 8 makes the machine faster: constructor ~1.9x, `update` ~1.4x, `extractList` ~1.8-2.7x, `exportState`/`importState` ~1.9x, `reset` ~4.6x. Each machine keeps about half the memory (200-item state data: 765 KB → 377 KB);
 - [x] Dependency update: dt-queries@1.1.8;
+- [x] Dependency update: ask-for-promise@3.2.1;
 - [x] Package: A `files` list in `package.json` replaces `.npmignore`. The coverage report, `rollup.config.js`, `blueprint.md` and `README_v.4.x.x.md` are no longer published (tarball 79 KB → 39 KB);
 - [x] Package: `prepublishOnly` runs the tests and the type tests, then builds the bundles;
 - [x] Tests: Regression tests for debug mode without `global` and for keys with special characters. 29 → 31 tests. The CommonJS type test also covers `import Fsm = require(...)`;
