@@ -3,10 +3,12 @@
 ![version](https://img.shields.io/github/package-json/v/peterNaydenov/fsm)
 ![license](https://img.shields.io/github/license/peterNaydenov/fsm)
 
-## What's new in version 5.x.x
-- For fast upgrade, checkout the [Migration Guide](https://github.com/PeterNaydenov/fsm/blob/master/Migration.guide.md)
+## What's new in version 6.x.x
+- dt-toolbox 8: the machine is faster (about 1.4x-4.6x) and keeps about half the memory;
+- Correct TypeScript types for CommonJS (`require`) consumers;
+- `debug: true` works in browsers (`globalThis.debugFSM`);
+- The machine API is the same as in version 5. For the few breaking changes, checkout the [Migration Guide](https://github.com/PeterNaydenov/fsm/blob/master/Migration.guide.md)
 - List of [all changes are available in Changelog file](https://github.com/PeterNaydenov/fsm/blob/master/Changelog.md)
-- Documentation is updated to reflect the changes in version 5.x.x;
 
 ## Description
 Finite state machine(FSM) is an abstract machine that can be in exactly one of a finite number of **states** at any given time. The FSM can change from one state to another in response to some external inputs(**actions**). The change from state to another is called a **transition**. 
@@ -84,13 +86,19 @@ import Fsm from '@peter.naydenov/fsm'
 ```
 ... where **machine** is fsm-description and **lib** is a transition-library.
 
+CommonJS projects can use `require`:
+
+```js
+const Fsm = require ( '@peter.naydenov/fsm' )
+```
+
 TypeScript declarations are generated from the source JSDoc and included in
-`dist/types`. TypeScript resolves them through the package entry point.
+`dist/types`: `main.d.ts` for ES modules and `main.d.cts` (`export =`) for CommonJS.
+TypeScript resolves them through the package entry point. In CommonJS TypeScript
+files, named types are on the namespace: `Fsm.FsmDefinition`.
 Run `npm run build:types` to generate declarations only, or `npm run build`
 to generate declarations and JavaScript bundles. Run `npm run test:types`
 to check the declarations with TypeScript consumers.
-
-If your project is commonJS, use a dynamic `import` function or use version v.3.0.0 or older.
 
 
 
