@@ -9,7 +9,7 @@ Implement the requested machine with `@peter.naydenov/fsm`, preserving the appli
 
 ## Workflow
 
-1. Inspect the existing machine, transition library, and installed package version. The bundled references describe the 5.x API; use the installed source or JSDoc to resolve version differences.
+1. Inspect the existing machine, transition library, and installed package version. The bundled references describe the 6.x API (the same as 5.x); use the installed source or JSDoc to resolve version differences.
 2. Identify the initial state, input actions, destination states, and data fields. Express each rule as `[fromState, action, nextState, transitionName, optionalChain]`; provide the named function in the transition library.
 3. Predeclare state-data fields in the configuration. Read them through `extractList()` and update them through successful transition results.
 4. Complete every transition path with `task.done({success, stateData?, response?})`. For asynchronous work, catch expected failures and complete with `success: false` so the update can finish and failure chains can run.
