@@ -44,7 +44,7 @@ export type FsmDefinition = {
     stateData?: Record<string, any>;
     /**
      * - Log missing transitions and expose the internal
-     * machine as `global.debugFSM` in environments that provide `global`.
+     * machine as `globalThis.debugFSM`.
      */
     debug?: boolean;
     /**
@@ -55,11 +55,11 @@ export type FsmDefinition = {
 export type ExtractList = ((requestedSegments: Array<string>, options?: StateDataFormat | false) => Array<any>) & (() => Record<string, any>);
 export type DtToolbox = {
     /**
-     * - Initialize data.
+     * - Initialize data; throws on an unsupported model.
      */
     init: (data: any, options?: {
         model?: string;
-    }) => (DtObject | null);
+    }) => DtObject;
     /**
      * - Load an exported model.
      */
