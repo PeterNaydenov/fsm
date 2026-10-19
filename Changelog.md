@@ -2,6 +2,11 @@
 
 
 
+### 6.1.0 ( 2026-10-19)
+- [x] Dependency update: @peter.naydenov/dt-queries@2.0.0;
+
+
+
 ### 6.0.0 ( 2026-10-17)
 - [x] Breaking: Dependency update: dt-toolbox@8.1.3. The built-in `walk` dependency is now `@peter.naydenov/walk` v7: in walk callbacks, `return IGNORE` must become `return IGNORE()`. See `Migration.guide.md`;
 - [x] Breaking: `exportState()` keeps Date and RegExp values as plain values in the model. Before, they were `{ __dtSentinel__ }` objects. A snapshot passed in memory restores them as before, but a snapshot sent through `JSON.stringify` now comes back with a date string and an empty object for a RegExp. Snapshots exported by 5.x still import correctly;
