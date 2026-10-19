@@ -44,7 +44,7 @@
     "prepublishOnly": "npm test && npm run test:types && rollup -c"
   },
   "dependencies": {
-    "@peter.naydenov/dt-queries": "^1.1.8",
+    "@peter.naydenov/dt-queries": "^2.0.0",
     "ask-for-promise": "^3.2.1",
     "dt-toolbox": "^8.1.3"
   },
